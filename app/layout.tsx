@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react"; // Import SessionProvider
 import { Inter } from "next/font/google";
+
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,7 +20,7 @@ export default function RootLayout({
   session?: any; // Type accordingly based on your session object's structure
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark:dark text-foreground bg-background">
       <SessionProvider session={session}>{/* Wrap children with SessionProvider */}
         <body className={inter.className}>
           {children}
