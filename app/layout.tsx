@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className=" light dark:dark text-foreground bg-background dark:bg-background">
       <SessionProvider session={session}>{/* Wrap children with SessionProvider */}
-        <body className={`${inter.className} bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0]  dark:bg-gradient-to-l dark:from-slate-950 dark:to-black`}>
+        <body className={`${inter.className} bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0] dark:bg-dark-background dark:bg-blend-multiply`}>
           {children}
         </body>
       </SessionProvider>

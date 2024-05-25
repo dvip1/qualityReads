@@ -14,6 +14,10 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "dark-background": "linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.25) 200%)",
+      },
+      backgroundBlendMode: {
+        'multiply': 'multiply',
       },
     },
   },
@@ -21,11 +25,12 @@ const config: Config = {
     themes: {
       light: {
         colors: {
+          background: "#F6F5F5"
         }
       },
       dark: {
         colors: {
-          background: '#202020',
+          background: '#31363F',
         }
       }
     }
