@@ -21,7 +21,6 @@ const config: Config = {
     themes: {
       light: {
         colors: {
-          background: "#B4B4B8",
         }
       },
       dark: {
