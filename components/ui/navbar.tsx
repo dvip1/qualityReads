@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react"
 import DefaultUserProfile from "@/public/user.png"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
 
 import { signOut } from "next-auth/react"
 import { FaLeaf } from "react-icons/fa";
@@ -13,10 +13,6 @@ export default function NavBar() {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    }
     const handleSignOut = async () => {
 
         await signOut();
@@ -27,7 +23,10 @@ export default function NavBar() {
         router.push("/profile");
     }
     return (
-        <Navbar className="bg-transparent ">
+        <Navbar onMenuOpenChange={setIsMenuOpen}>
+            <NavbarContent className="sm:hidden" justify="start">
+                <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
+            </NavbarContent>
             <NavbarBrand>
                 <FaLeaf />
                 <p className="font-bold text-inherit pl-1"> QualityReads</p>
@@ -63,17 +62,33 @@ export default function NavBar() {
                         />
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Profile Actions" variant="flat" className="">
-                        <DropdownItem key="profile" className="h-14 gap-2">
+                        <DropdownItem key="profile" className="h-14 gap-2" onClick={handleProfileClick}>
                             <p className="font-semibold">Signed in as</p>
                             <p className="font-semibold">{session?.user?.email}</p>
                         </DropdownItem>
-                        <DropdownItem key="settings" onClick={handleProfileClick}>My Profile</DropdownItem>
                         <DropdownItem key="logout" color="danger" onClick={handleSignOut}>
                             Log Out
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </NavbarContent>
+            <NavbarMenu>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="#" size="lg">
+                        Home
+                    </Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="#" size="lg">
+                        Trending
+                    </Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="#" size="lg">
+                        About
+                    </Link>
+                </NavbarMenuItem>
+            </NavbarMenu>
         </Navbar >
     )
 }
