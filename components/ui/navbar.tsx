@@ -5,20 +5,20 @@ import DefaultUserProfile from "@/public/user.png"
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
-
 import { signOut } from "next-auth/react"
 import { FaLeaf } from "react-icons/fa";
-
+import { usePathname } from "next/navigation";
 export default function NavBar() {
     const router = useRouter();
+    const pathname = usePathname();
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const handleSignOut = async () => {
 
+    const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
     };
-
+    console.log(`Current Path name: ${pathname}`);
     const handleProfileClick = () => {
         router.push("/profile");
     }
@@ -29,7 +29,9 @@ export default function NavBar() {
             </NavbarContent>
             <NavbarBrand>
                 <FaLeaf />
-                <p className="font-bold text-inherit pl-1"> QualityReads</p>
+                <Link href="/">
+                    <p className="font-bold text-inherit pl-1 dark:text-white text-black"> QualityReads</p>
+                </Link>
             </NavbarBrand>
             <NavbarContent className="hidden sm:flex gap-4 " justify="center">
                 <NavbarItem>
@@ -38,13 +40,13 @@ export default function NavBar() {
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="#" aria-current="page" color="secondary">
-                        Customers
+                    <Link href="/" aria-current="page" color="secondary">
+                        Home
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Integrations
+                        Post
                     </Link>
                 </NavbarItem>
             </NavbarContent>

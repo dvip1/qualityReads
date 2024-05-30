@@ -20,7 +20,7 @@ export default function RootLayout({
   session?: any; // Type accordingly based on your session object's structure
 }>) {
   return (
-    <html lang="en" className=" light dark:dark text-foreground bg-background dark:bg-background">
+    <html lang="en" className=" light dark:dark text-foreground bg-background ">
       <SessionProvider session={session}>{/* Wrap children with SessionProvider */}
         <body className={`${inter.className} bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0] dark:bg-dark-background dark:bg-blend-multiply`}>
           {children}
