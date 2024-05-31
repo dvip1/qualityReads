@@ -10,7 +10,7 @@ interface ProfileHeaderType {
 }
 
 
-interface User {
+export interface UserTypes {
     _id: ObjectId;
     name: string;
     email: string;
@@ -23,7 +23,7 @@ async function getData(email: string | undefined | null) {
         const client = await clientPromise;
         const db = client.db();
         const collection = db.collection('users');
-        const user = await collection.findOne({ email: email }) as User;
+        const user = await collection.findOne({ email: email }) as UserTypes;
         return user;
     } catch (err) {
         console.error('Error:', err)

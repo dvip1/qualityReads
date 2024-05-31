@@ -45,7 +45,7 @@ export default function NavBar() {
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Link color="foreground" href="#">
+                    <Link color="foreground" href="/post">
                         Post
                     </Link>
                 </NavbarItem>

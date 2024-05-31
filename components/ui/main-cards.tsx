@@ -6,7 +6,7 @@ export default function MainCards() {
 
     const url = "https://www.wikipedia.org/"
     return (
-        <div className="p-4">
+        <div className="">
             <SmallCards url={url} />
         </div>
     )
@@ -36,7 +36,7 @@ const SmallCards: React.FC<SmallCardsType> = (props) => {
         }
     };
     return (
-        <Card className="max-w-[400px] h-fit" isBlurred >
+        <Card className="max-w-[400px] h-fit my-2" isBlurred >
             <CardHeader className="flex gap-3">
                 <Image
                     alt="nextui logo"
