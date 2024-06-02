@@ -45,8 +45,8 @@ export default function NavBar() {
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Link color="foreground" href="/post">
-                        Post
+                    <Link color="foreground" href="/genre">
+                        Genre
                     </Link>
                 </NavbarItem>
             </NavbarContent>
