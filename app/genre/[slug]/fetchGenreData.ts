@@ -22,6 +22,9 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
             .limit(props.limit)
             .toArray();
 
+        // Get total number of posts
+        const totalPosts = await Postcollection.countDocuments({ category: props.category });
+
         // For each post, find the user data
         const postsWithUserData = await Promise.all(posts.map(async (post) => {
             const user = await Userscollection.findOne({ _id: post.user_id }, { projection: { name: 1, image: 1 } });
@@ -35,8 +38,7 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
                 content: post.content
             };
         }));
-
-        return postsWithUserData;
+        return { posts: postsWithUserData, total: totalPosts };
     }
     catch (e) {
         console.error(`Error occurred ${e}`);
