@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react"; // Import SessionProvider
 import { Inter } from "next/font/google";
-
+import { createOptimizedIndexes } from "@/lib/createIndexes";
 import "./globals.css";
-
+createOptimizedIndexes();
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

@@ -23,7 +23,7 @@ const PostComponent = () => {
     const handleAutoCompleteChange = (value: string) => {
         console.log(`something in handleAuto ${value}`);
         if (value) {
-            if (value === "lifestyle")
+            if (value === "Lifestyle")
                 setPrimaryValue(lifestyle)
             else if (value === "Hobbies & Interests")
                 setPrimaryValue(hobbies);

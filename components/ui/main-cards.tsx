@@ -7,14 +7,25 @@ export default function MainCards() {
     const url = "https://www.wikipedia.org/"
     return (
         <div className="">
-            <SmallCards url={url} />
+            <SmallCards url={url} title="some title" tags={[]} likes={0} dislikes={0}
+                name="my name" image="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+                content="Make beautiful websites regardless of your design experience."
+            />
         </div>
     )
 }
-interface SmallCardsType {
+export interface SmallCardsType {
+    _id?: string
     url: string
+    title: string
+    tags: string[]
+    likes: number
+    dislikes: number
+    content: string
+    name: string
+    image: string
 }
-const SmallCards: React.FC<SmallCardsType> = (props) => {
+export const SmallCards: React.FC<SmallCardsType> = (props) => {
     const [liked, setLiked] = useState(false);
     const [disliked, setDisliked] = useState(false);
 
@@ -42,21 +53,21 @@ const SmallCards: React.FC<SmallCardsType> = (props) => {
                     alt="nextui logo"
                     height={40}
                     radius="sm"
-                    src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+                    src={props.image}
                     width={40}
                 />
                 <div className="flex flex-col">
-                    <p className="text-md">NextUI</p>
-                    <p className="text-small text-default-500">nextui.org</p>
+                    <p className="text-md">{props.name}</p>
+                    {/* <p className="text-small text-default-500">loves knowledge</p> */}
                 </div>
             </CardHeader>
             <Divider />
             <CardBody>
-                <p>Make beautiful websites regardless of your design experience.</p>
+                <p>{props.content}</p>
                 <Link
                     isExternal
                     showAnchorIcon
-                    href="https://github.com/nextui-org/nextui"
+                    href={props.url}
                 >
                     Visit source code on GitHub.
                 </Link>
@@ -74,4 +85,4 @@ const SmallCards: React.FC<SmallCardsType> = (props) => {
             </CardFooter>
         </Card>
     )
-}
+};
