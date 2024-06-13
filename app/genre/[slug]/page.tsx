@@ -61,7 +61,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col gap-5 items-center mt-24">
+                <div className={`flex flex-col gap-5 items-center mt-24 ${(totalPages>1)?'':'hidden'}`}>
                 
                     <Pagination
                         total={totalPages} // Use totalPages instead of hardcoding 10

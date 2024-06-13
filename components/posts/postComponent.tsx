@@ -1,7 +1,7 @@
 "use client"
 import { ReactEventHandler, useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, RadioGroup, Radio, Input, Textarea } from "@nextui-org/react";
-import { FaPenNib } from "react-icons/fa";
+import { FaPenToSquare } from "react-icons/fa6";
 import CreatePost, { postDataTypes } from "./createPost";
 import { parseHashtags, getHashtagsArray } from "./utils";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
@@ -62,7 +62,7 @@ const PostComponent = () => {
                     onChange={(e) => setTitle(e.target.value)}
 
                 />
-                <Button onClick={handleButtonClick} className="max-w-fit" color="primary"> <FaPenNib /> post</Button>
+                <Button onClick={handleButtonClick} className="max-w-fit" color="primary"> <span> <FaPenToSquare /></span> Write</Button>
             </span>
             <Modal
                 backdrop="opaque"

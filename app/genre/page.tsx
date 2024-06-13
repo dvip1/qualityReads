@@ -4,6 +4,7 @@ import NavBar from "@/components/ui/navbar"
 import Link from "next/link";
 import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
 import { differentGenre, GenreTypes } from "./data";
+import { BiSolidCategoryAlt } from "react-icons/bi";
 interface GenreCardProps {
     genre: GenreTypes;
 }
@@ -11,12 +12,12 @@ interface GenreCardProps {
 export default function Genre() {
     return (
         <ProtectedRoute>
-            <div className="min-h-screen">
+            <div className="min-h-screen pb-10">
                 <NavBar />
                 <div className="max-w-full flex justify-center">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-                            Genre
+                        <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
+                            <BiSolidCategoryAlt className="mr-2" /> Genre
                         </h1>
                         <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
                             {differentGenre.map((genre: GenreTypes, index) => (

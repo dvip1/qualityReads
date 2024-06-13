@@ -2,7 +2,7 @@
 import Image from "next/image"
 import { useSession } from "next-auth/react"
 import DefaultUserProfile from "@/public/user.png"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
 import { signOut } from "next-auth/react"
@@ -13,15 +13,25 @@ export default function NavBar() {
     const pathname = usePathname();
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const [isActive, setIsActive] = useState(0);
     const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
     };
-    console.log(`Current Path name: ${pathname}`);
     const handleProfileClick = () => {
         router.push("/profile");
     }
+    useEffect(() => {
+        console.log(`Current Path name: ${pathname}`);
+
+        const temp = () => {
+            if (pathname.startsWith("/genre")) return 1;
+            else if (pathname === "/reading-list") return 2;
+            else return 0;
+        }
+
+        setIsActive(temp());
+    }, [pathname]);
     return (
         <Navbar onMenuOpenChange={setIsMenuOpen}>
             <NavbarContent className="sm:hidden" justify="start">
@@ -34,17 +44,17 @@ export default function NavBar() {
                 </Link>
             </NavbarBrand>
             <NavbarContent className="hidden sm:flex gap-4 " justify="center">
-                <NavbarItem>
-                    <Link color="foreground" href="#">
-                        Features
+                <NavbarItem isActive={2 === isActive}>
+                    <Link color="foreground" href="/reading-list">
+                        My List
                     </Link>
                 </NavbarItem>
-                <NavbarItem isActive>
-                    <Link href="/" aria-current="page" color="secondary">
+                <NavbarItem isActive={0 === isActive} >
+                    <Link href="/" aria-current="page" color="foreground" >
                         Home
                     </Link>
                 </NavbarItem>
-                <NavbarItem>
+                <NavbarItem isActive={1 === isActive}>
                     <Link color="foreground" href="/genre">
                         Genre
                     </Link>
@@ -82,7 +92,7 @@ export default function NavBar() {
                 </NavbarMenuItem>
                 <NavbarMenuItem >
                     <Link className="w-full" href="#" size="lg">
-                        Trending
+                        Reading List
                     </Link>
                 </NavbarMenuItem>
                 <NavbarMenuItem >

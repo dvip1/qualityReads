@@ -47,42 +47,46 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         }
     };
     return (
-        <Card className="max-w-[400px] h-fit my-2" isBlurred >
-            <CardHeader className="flex gap-3">
-                <Image
-                    alt="nextui logo"
-                    height={40}
-                    radius="sm"
-                    src={props.image}
-                    width={40}
-                />
-                <div className="flex flex-col">
-                    <p className="text-md">{props.name}</p>
-                    {/* <p className="text-small text-default-500">loves knowledge</p> */}
-                </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-                <p>{props.content}</p>
-                <Link
-                    isExternal
-                    showAnchorIcon
-                    href={props.url}
-                >
-                    Visit source code on GitHub.
-                </Link>
-            </CardBody>
-            <Divider />
-            <CardFooter >
-                <button onClick={handleLikeClick} className="flex items-center space-x-2 pr-2">
-                    {liked ? <HandThumbUpSolidIcon className="h-8 text-blue-500" /> : <HandThumbUpOutlineIcon className="h-8 text-gray-500" />}
-                    <span>{liked ? 'Liked' : 'Like'}</span>
-                </button>
-                <button onClick={handleDislikeClick} className="flex items-center space-x-2">
-                    {disliked ? <HandThumbDownSolidIcon className="h-8 text-red-500" /> : <HandThumbDownOutlineIcon className="h-8 text-gray-500" />}
-                    <span>{disliked ? 'Disliked' : 'Dislike'}</span>
-                </button>
-            </CardFooter>
-        </Card>
+        <>
+            <div className="">
+                <Card className="max-w-[400px] h-fit my-2" isBlurred >
+                    <CardHeader className="flex gap-3">
+                        <Image
+                            alt="nextui logo"
+                            height={40}
+                            radius="sm"
+                            src={props.image}
+                            width={40}
+                        />
+                        <div className="flex flex-col">
+                            <p className="text-md">{props.name}</p>
+                            {/* <p className="text-small text-default-500">loves knowledge</p> */}
+                        </div>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                        <p>{props.content}</p>
+                        <Link
+                            isExternal
+                            showAnchorIcon
+                            href={props.url}
+                        >
+                            Visit source code on GitHub.
+                        </Link>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter >
+                        <button onClick={handleLikeClick} className="flex items-center space-x-2 pr-2">
+                            {liked ? <HandThumbUpSolidIcon className="h-8 text-blue-500" /> : <HandThumbUpOutlineIcon className="h-8 text-gray-500" />}
+                            <span>{liked ? 'Liked' : 'Like'}</span>
+                        </button>
+                        <button onClick={handleDislikeClick} className="flex items-center space-x-2">
+                            {disliked ? <HandThumbDownSolidIcon className="h-8 text-red-500" /> : <HandThumbDownOutlineIcon className="h-8 text-gray-500" />}
+                            <span>{disliked ? 'Disliked' : 'Dislike'}</span>
+                        </button>
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
     )
 };
