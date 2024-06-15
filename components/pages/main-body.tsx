@@ -1,7 +1,9 @@
+"use client"
 import MainCards from "@/components/ui/main-cards";
 import PostComponent from "@/components/posts/postComponent";
 import { BiSolidHomeCircle } from "react-icons/bi";
 export default function MainBody() {
+  
     return (
         <div className="flex flex-col items-center w-full min-h-screen pb-10">
             <div className="max-w-full flex justify-center">

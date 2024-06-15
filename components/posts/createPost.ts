@@ -23,7 +23,7 @@ const CreatePost = async (postData: postDataTypes) => {
         const Userscollection = db.collection('users');
         const UserData = await Userscollection.findOne({ email: session?.user?.email }) as UserTypes;
         const user_id = UserData._id;
-
+        
         const insertData = {
             ...postData,
             "user_id": user_id,
