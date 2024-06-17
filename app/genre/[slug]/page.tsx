@@ -10,6 +10,7 @@ import fetchGenreData from "./fetchGenreData";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
+import { ObjectId } from "mongodb";
 
 export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,20 +20,20 @@ export default function Page({ params }: { params: { slug: string } }) {
         notFound();
 
     const title = SlugToTitle[params.slug];
-    const [mainData, setMainData] = useState<Array<{ user: { name: string, image: string }, url: string, title: string, tags: string[], likes: number, dislikes: number, content: string }>>([]);
+    const [mainData, setMainData] = useState<Array<{ user: { name: string, image: string }, url: string, title: string, tags: string[], likes: number, dislikes: number, content: string, postId: ObjectId }>>([]);
     useEffect(() => {
         const fetchData = async () => {
             const data = {
                 category: title,
-                page: currentPage, 
+                page: currentPage,
                 limit: 15,
             };
             const result = await fetchGenreData(data);
-            setMainData(result.posts); 
+            setMainData(result.posts);
             setTotalPages(Math.ceil(result.total / data.limit)); // 
         };
         fetchData();
-    }, [title, currentPage]); 
+    }, [title, currentPage]);
 
 
     return (
@@ -48,6 +49,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                             {mainData.map((data, index) => (
                                 <SmallCards
                                     key={index}
+                                    _id={data.postId}
                                     url={data.url}
                                     title={data.title}
                                     tags={data.tags}
@@ -61,8 +63,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                         </div>
                     </div>
                 </div>
-                <div className={`flex flex-col gap-5 items-center mt-24 ${(totalPages>1)?'':'hidden'}`}>
-                
+                <div className={`flex flex-col gap-5 items-center mt-24 ${(totalPages > 1) ? '' : 'hidden'}`}>
+
                     <Pagination
                         total={totalPages} // Use totalPages instead of hardcoding 10
                         color="secondary"

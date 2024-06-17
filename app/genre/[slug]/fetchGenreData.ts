@@ -35,10 +35,18 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
                 tags: post.tags,
                 likes: post.likes,
                 dislikes: post.dislikes,
-                content: post.content
+                content: post.content,
+                postId: post._id
             };
         }));
-        return { posts: postsWithUserData, total: totalPosts };
+        return JSON.parse(
+            JSON.stringify(
+                {
+
+                    posts: postsWithUserData,
+                    total: totalPosts
+                }
+            ));
     }
     catch (e) {
         console.error(`Error occurred ${e}`);

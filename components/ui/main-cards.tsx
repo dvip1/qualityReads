@@ -3,7 +3,7 @@ import { HandThumbUpIcon as HandThumbUpOutlineIcon, HandThumbDownIcon as HandThu
 import { HandThumbUpIcon as HandThumbUpSolidIcon, HandThumbDownIcon as HandThumbDownSolidIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
-import LikePost, { LikePostTypes } from "@/utils/interactions";
+import { LikePostTypes, LikePost, DislikePost, DislikePostTypes } from "@/utils/interactions";
 import { ObjectId } from "mongodb";
 
 export default function MainCards() {
@@ -32,22 +32,83 @@ export interface SmallCardsType {
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
     const [liked, setLiked] = useState(false);
     const [disliked, setDisliked] = useState(false);
-
-    const handleReactionClick = async (reaction: 'like' | 'dislike', propId) => {
-        if (reaction === 'like') {
-            const sendObject: LikePostTypes = {
-                like: liked,
+    const [likes, setLikes] = useState(props.likes);
+    const [dislikes, setDislikes] = useState(props.dislikes);
+    const propId = props._id;
+    const handleDislike = async () => {
+        if (disliked) {
+            const sendObject: DislikePostTypes = {
+                dislike: false,
                 postId: propId
             }
-            setLiked(prevLiked => !prevLiked);
-            await LikePost(sendObject);
+            const updatedData = await DislikePost(sendObject);
+            console.log(updatedData);
+            if (updatedData) {
+                console.log(updatedData)
+                setDislikes(updatedData.dislikes);
+                setDisliked(false);
+            }
+        } else {
+            const sendObject: DislikePostTypes = {
+                dislike: true,
+                postId: propId
+            }
+            const sendLiked: LikePostTypes = {
+                like: false,
+                postId: propId
+            }
+            if (liked) {
+                await LikePost(sendLiked);
+                setLiked(false);
+            }
+            const updatedData = await DislikePost(sendObject);
+            console.log(updatedData)
 
-            if (!liked) setDisliked(false);
-        } else if (reaction === 'dislike') {
-            setDisliked(prevDisliked => !prevDisliked);
-            if (!disliked) setLiked(false);
+            if (updatedData) {
+                setDislikes(updatedData.dislikes);
+                setLikes(updatedData.likes);
+                setDisliked(true);
+            }
         }
     };
+    const handleLike = async () => {
+
+        if (liked) {
+            const sendObject: LikePostTypes = {
+                like: false,
+                postId: propId
+            }
+            const updatedData = await LikePost(sendObject);
+            if (updatedData) {
+                console.log(updatedData)
+                setLikes(updatedData.likes);
+                setDislikes(updatedData.dislikes);
+                setLiked(false);
+            }
+        } else {
+            const sendObject: LikePostTypes = {
+                like: true,
+                postId: propId
+            }
+            const sendDislike: DislikePostTypes = {
+                dislike: false,
+                postId: propId
+            }
+            if (disliked) {
+                await DislikePost(sendDislike);
+                setDisliked(false);
+            }
+            const updatedData = await LikePost(sendObject);
+            console.log(updatedData)
+
+            if (updatedData) {
+                setLikes(updatedData.likes);
+                setDislikes(updatedData.dislikes);
+                setLiked(true);
+            }
+        }
+    };
+
     return (
         <>
             <Card className="max-w-[400px] h-fit my-2" isBlurred >
@@ -78,18 +139,18 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 <Divider />
                 <CardFooter >
                     <Button
-                        onClick={() => handleReactionClick('like', props._id)}
+                        onClick={() => handleLike()}
                         className="flex items-center space-x-1 pr-4 mr-2 text-black dark:text-white"
                         radius="full"
                         color="default"
                         variant="flat"
                     >
                         {liked ? <HandThumbUpSolidIcon className="h-8 text-blue-500" /> : <HandThumbUpOutlineIcon className="h-8 text-gray-500" />}
-                        <span>{liked ? '1' : '0'}</span>
+                        <span>{likes}</span>
                     </Button>
-                    <button onClick={() => handleReactionClick('dislike', props._id)} className="flex items-center space-x-2">
+                    <button onClick={() => handleDislike()} className="flex items-center space-x-2">
                         {disliked ? <HandThumbDownSolidIcon className="h-8 text-red-500" /> : <HandThumbDownOutlineIcon className="h-8 text-gray-500" />}
-                        <span>{disliked ? 'Disliked' : 'Dislike'}</span>
+                        <span>{dislikes}</span>
                     </button>
                 </CardFooter>
             </Card>
