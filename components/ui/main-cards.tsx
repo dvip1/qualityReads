@@ -14,6 +14,8 @@ export default function MainCards() {
             <SmallCards url={url} title="some title" tags={[]} likes={0} dislikes={0}
                 name="my name" image="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
                 content="Make beautiful websites regardless of your design experience."
+                userLiked={false}
+                userDisliked={false}
             />
         </div>
     )
@@ -28,10 +30,12 @@ export interface SmallCardsType {
     content: string
     name: string
     image: string
+    userLiked: boolean
+    userDisliked: boolean
 }
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
-    const [liked, setLiked] = useState(false);
-    const [disliked, setDisliked] = useState(false);
+    const [liked, setLiked] = useState(props.userLiked);
+    const [disliked, setDisliked] = useState(props.userDisliked);
     const [likes, setLikes] = useState(props.likes);
     const [dislikes, setDislikes] = useState(props.dislikes);
     const propId = props._id;
@@ -42,9 +46,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 postId: propId
             }
             const updatedData = await DislikePost(sendObject);
-            console.log(updatedData);
             if (updatedData) {
-                console.log(updatedData)
                 setDislikes(updatedData.dislikes);
                 setDisliked(false);
             }
@@ -62,7 +64,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 setLiked(false);
             }
             const updatedData = await DislikePost(sendObject);
-            console.log(updatedData)
 
             if (updatedData) {
                 setDislikes(updatedData.dislikes);
@@ -80,7 +81,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
             }
             const updatedData = await LikePost(sendObject);
             if (updatedData) {
-                console.log(updatedData)
                 setLikes(updatedData.likes);
                 setDislikes(updatedData.dislikes);
                 setLiked(false);
@@ -99,7 +99,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 setDisliked(false);
             }
             const updatedData = await LikePost(sendObject);
-            console.log(updatedData)
 
             if (updatedData) {
                 setLikes(updatedData.likes);
