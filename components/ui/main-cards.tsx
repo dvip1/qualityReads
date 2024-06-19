@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
 import { LikePostTypes, LikePost, DislikePost, DislikePostTypes } from "@/utils/interactions";
 import { ObjectId } from "mongodb";
-
+import { Chip } from "@nextui-org/react";
 export default function MainCards() {
 
     const url = "https://www.wikipedia.org/"
@@ -33,6 +33,10 @@ export interface SmallCardsType {
     userLiked: boolean
     userDisliked: boolean
 }
+function removeHashtags(text: string) {
+    return text.replace(/#[^\s#]+/g, '').trim();
+}
+
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
     const [liked, setLiked] = useState(props.userLiked);
     const [disliked, setDisliked] = useState(props.userDisliked);
@@ -110,8 +114,8 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
 
     return (
         <>
-            <Card className="max-w-[400px] h-fit my-2" isBlurred >
-                <CardHeader className="flex gap-3">
+            <Card className="max-w-[350px]  my-2 " isBlurred >
+                <CardHeader className=" flex gap-3 ">
                     <Image
                         alt="nextui logo"
                         height={40}
@@ -121,19 +125,28 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                     />
                     <div className="flex flex-col">
                         <p className="text-md">{props.name}</p>
-                        <p className="text-small text-default-500">{props.title}</p>
+
                     </div>
                 </CardHeader>
                 <Divider />
-                <CardBody>
-                    <p>{props.content}</p>
+                <CardBody className="flex flex-col gap-1">
+                    <p className="text-small ">{props.title}</p>
+                    <p className="text-small text-black/60 dark:text-white/60">{removeHashtags(props.content)}</p>
+
                     <Link
                         isExternal
                         showAnchorIcon
                         href={props.url}
+                        className="text-blue-500"
                     >
-                        Visit source code on GitHub.
+                        {props.url}
                     </Link>
+                    <div className="flex flex-wrap mt-auto">
+                        {
+                            props.tags.map((item, index) => (
+                                <p key={index} className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"> {item}</p>))
+                        }
+                    </div>
                 </CardBody>
                 <Divider />
                 <CardFooter >

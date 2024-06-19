@@ -58,7 +58,7 @@ const PostComponent = () => {
             <span className="flex max-w-[400px] items-center ">
                 <Input type="text" label="Title" size="sm" className="px-2"
                     value={title}
-                    maxLength={100}
+                    maxLength={50}
                     onChange={(e) => setTitle(e.target.value)}
 
                 />
@@ -81,14 +81,14 @@ const PostComponent = () => {
                                     className="max-w-xs"
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
-                                    maxLength={280}
+                                    maxLength={180}
                                 />
                                 <div className="flex flex-wrap">
                                     {parseHashtags(content)}
                                 </div>
                                 <Input
-                                    type="url"
                                     label="Website"
+                                    type="url"
                                     placeholder="https://x.com/PatelDvip"
                                     labelPlacement="outside"
                                     isRequired

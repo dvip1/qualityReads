@@ -1,13 +1,13 @@
 "use server"
 import clientPromise from "@/lib/db";
 import fetchUserData from "@/utils/fetchUserData";
-interface fetchGenreTypes {
-    category: string
+
+interface fetchHomeTypes {
     page: number
     limit: number
 }
 
-const fetchGenreData = async (props: fetchGenreTypes) => {
+const fetchHomeData = async (props: fetchHomeTypes) => {
     try {
         const client = await clientPromise;
         const db = client.db();
@@ -17,15 +17,15 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
         // Calculate the number of documents to skip for pagination
         const skips = props.limit * (props.page - 1);
 
-        // Find posts by category with pagination
-        const posts = await Postcollection.find({ category: props.category })
+        // Find all posts with pagination
+        const posts = await Postcollection.find()
             .sort({ created_at: -1 }) // Sort by creation date in descending order
             .skip(skips)
             .limit(props.limit)
             .toArray();
 
         // Get total number of posts
-        const totalPosts = await Postcollection.countDocuments({ category: props.category });
+        const totalPosts = await Postcollection.countDocuments();
         console.log(`Current User: ${CurrentUserData._id}`);
         // For each post, find the user data
         const postsWithUserData = await Promise.all(posts.map(async (post) => {
@@ -49,7 +49,6 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
         return JSON.parse(
             JSON.stringify(
                 {
-
                     posts: postsWithUserData,
                     total: totalPosts
                 }
@@ -60,4 +59,4 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
         throw new Error(`Error occurred during creating Post ${e}`)
     }
 }
-export default fetchGenreData;
+export default fetchHomeData;

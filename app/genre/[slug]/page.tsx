@@ -4,14 +4,30 @@ import NavBar from "@/components/ui/navbar";
 import { notFound } from "next/navigation";
 import isValidSlug from "./isValidSlug";
 import { SlugToTitle } from "./data";
-import { SmallCards, SmallCardsType } from "@/components/ui/main-cards";
+import { SmallCards } from "@/components/ui/main-cards";
 import { useEffect, useState } from "react";
 import fetchGenreData from "./fetchGenreData";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { ObjectId } from "mongodb";
+interface UserTypes {
+    name: string;
+    image: string;
+}
 
+export interface PostData {
+    user: UserTypes;
+    url: string;
+    title: string;
+    tags: string[];
+    likes: number;
+    dislikes: number;
+    content: string;
+    postId: ObjectId;
+    userLiked: boolean;
+    userDisliked: boolean;
+}
 export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
@@ -20,7 +36,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         notFound();
 
     const title = SlugToTitle[params.slug];
-    const [mainData, setMainData] = useState<Array<{ user: { name: string, image: string }, url: string, title: string, tags: string[], likes: number, dislikes: number, content: string, postId: ObjectId }>>([]);
+    const [mainData, setMainData] = useState<PostData[]>([]);
     useEffect(() => {
         const fetchData = async () => {
             const data = {
@@ -58,6 +74,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     content={data.content}
                                     name={data.user.name}
                                     image={data.user.image}
+                                    userLiked={data.userLiked}
+                                    userDisliked={data.userDisliked}
                                 />
                             ))}
                         </div>
