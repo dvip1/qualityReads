@@ -12,15 +12,11 @@ export interface DislikePostTypes {
 }
 const LikePost = async (props: LikePostTypes) => {
     try {
-        console.log(props)
         const client = await clientPromise;
         const db = client.db();
         const Postcollection = db.collection('posts');
         const increment = props.like ? 1 : -1;
         const userData = await fetchUserData();
-        console.log(`UserData: ${userData._id}`)
-        console.log(`postId: ${props.postId}`);
-        console.log(`Increment: ${increment}`);
         const updateOperation: { $inc: { likes: number }, $push?: { liked_by?: ObjectId }, $pull?: { liked_by?: ObjectId } } = props.like
             ? { $inc: { likes: increment }, $push: { liked_by: userData._id } }
             : { $inc: { likes: increment }, $pull: { liked_by: userData._id } };
@@ -34,7 +30,6 @@ const LikePost = async (props: LikePostTypes) => {
         if (!updatedPost) {
             throw new Error("Post not found");
         }
-        console.log(`Updated likes: ${JSON.stringify(updatedPost)}`);
         return JSON.parse(JSON.stringify({ "likes": updatedPost?.likes, "dislikes": updatedPost?.dislikes, "liked_by": updatedPost?.liked_by }));
     }
     catch (e) {
@@ -43,15 +38,11 @@ const LikePost = async (props: LikePostTypes) => {
 }
 const DislikePost = async (props: DislikePostTypes) => {
     try {
-        console.log(props);
         const client = await clientPromise;
         const db = client.db();
         const Postcollection = db.collection('posts');
         const increment = props.dislike ? 1 : -1;
         const userData = await fetchUserData();
-        console.log(`UserData: ${userData._id}`);
-        console.log(`postId: ${props.postId}`);
-        console.log(`Increment: ${increment}`);
 
         const updateOperation: {
             $inc: { dislikes: number };
@@ -71,7 +62,6 @@ const DislikePost = async (props: DislikePostTypes) => {
             throw new Error("Post not found");
         }
 
-        console.log(`Updated dislikes: ${JSON.stringify(updatedPost)}`);
         return JSON.parse(
             JSON.stringify({
                 likes: updatedPost?.likes,

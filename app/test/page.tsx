@@ -1,7 +1,8 @@
 "use client"
 import { Textarea } from "@nextui-org/react"
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import FetchReadingList from "@/utils/fetchReadingList";
+import ProtectedRoute from "@/utils/protectedRoute";
 const parseHashtags = (text: string) => {
     const hashtagRegex = /#\w+/g;
     const hashtags = text.match(hashtagRegex);
@@ -18,10 +19,14 @@ const getHashtagsArray = (text: string) => {
 }
 
 export default function Test() {
+    const handleClick = async () => {
+        const readingList = await FetchReadingList({ page: 1, limit: 15 });
+        console.log(readingList);
+    }
     const [text, setText] = useState("");
     console.log(getHashtagsArray(text));
     return (
-        <>
+        <ProtectedRoute>
             <Textarea
                 label="Description"
                 placeholder="Enter your description"
@@ -29,9 +34,10 @@ export default function Test() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
             />
+            <button onClick={handleClick}>Click</button>
             <div className="flex flex-wrap">
                 {parseHashtags(text)}
             </div>
-        </>
+        </ProtectedRoute>
     )
 }

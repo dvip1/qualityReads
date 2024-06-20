@@ -1,7 +1,7 @@
 "use server"
 import clientPromise from "@/lib/db";
 import fetchUserData from "@/utils/fetchUserData";
-
+import { ObjectId } from "mongodb";
 interface fetchHomeTypes {
     page: number
     limit: number
@@ -26,12 +26,13 @@ const fetchHomeData = async (props: fetchHomeTypes) => {
 
         // Get total number of posts
         const totalPosts = await Postcollection.countDocuments();
-        console.log(`Current User: ${CurrentUserData._id}`);
         // For each post, find the user data
         const postsWithUserData = await Promise.all(posts.map(async (post) => {
             const user = await Userscollection.findOne({ _id: post.user_id }, { projection: { name: 1, image: 1 } });
             const userLiked = !!(await Postcollection.countDocuments({ _id: post._id, liked_by: { $in: [CurrentUserData._id] } }));
             const userDisliked = !!(await Postcollection.countDocuments({ _id: post._id, disliked_by: { $in: [CurrentUserData._id] } }));
+            const isPostInList: boolean = !!(await Userscollection.findOne({ _id: CurrentUserData._id, myList: { $in: [new ObjectId(post._id)] } }));
+            console.log(`This is isPostInList ${isPostInList} :${CurrentUserData._id}, ${post._id} `);
             return {
                 user: user ? { name: user.name, image: user.image } : { name: '', image: '' },
                 url: post.url,
@@ -42,10 +43,11 @@ const fetchHomeData = async (props: fetchHomeTypes) => {
                 userLiked,
                 userDisliked,
                 content: post.content,
-                postId: post._id
+                postId: post._id,
+                isPostInList
             };
         }));
-        console.log(`Sending User data: ${JSON.stringify(postsWithUserData)}`)
+
         return JSON.parse(
             JSON.stringify(
                 {

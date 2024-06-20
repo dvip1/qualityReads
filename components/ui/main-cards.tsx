@@ -5,21 +5,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
 import { LikePostTypes, LikePost, DislikePost, DislikePostTypes } from "@/utils/interactions";
 import { ObjectId } from "mongodb";
-import { Chip } from "@nextui-org/react";
-export default function MainCards() {
-
-    const url = "https://www.wikipedia.org/"
-    return (
-        <div className="">
-            <SmallCards url={url} title="some title" tags={[]} likes={0} dislikes={0}
-                name="my name" image="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                content="Make beautiful websites regardless of your design experience."
-                userLiked={false}
-                userDisliked={false}
-            />
-        </div>
-    )
-}
+import { BsPatchPlusFill } from "react-icons/bs";
+import { HiMinusCircle } from "react-icons/hi";
+import AddRemoveFromList, { MyListTypes } from "@/utils/addToList";
 export interface SmallCardsType {
     _id?: ObjectId
     url: string
@@ -32,6 +20,7 @@ export interface SmallCardsType {
     image: string
     userLiked: boolean
     userDisliked: boolean
+    isPostInList: boolean
 }
 function removeHashtags(text: string) {
     return text.replace(/#[^\s#]+/g, '').trim();
@@ -42,6 +31,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     const [disliked, setDisliked] = useState(props.userDisliked);
     const [likes, setLikes] = useState(props.likes);
     const [dislikes, setDislikes] = useState(props.dislikes);
+    const [addList, setAddList] = useState(props.isPostInList);
     const propId = props._id;
     const handleDislike = async () => {
         if (disliked) {
@@ -111,7 +101,17 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
             }
         }
     };
+    const handleAddToList = () => {
 
+        if (addList) {
+            setAddList(false);
+            propId && AddRemoveFromList({ postId: propId });
+        }
+        else {
+            setAddList(true);
+            propId && AddRemoveFromList({ postId: propId });
+        };
+    }
     return (
         <>
             <Card className="max-w-[350px]  my-2 " isBlurred >
@@ -143,27 +143,36 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                     </Link>
                     <div className="flex flex-wrap mt-auto">
                         {
-                            props.tags.map((item, index) => (
+                            props.tags && props.tags.map((item, index) => (
                                 <p key={index} className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"> {item}</p>))
                         }
                     </div>
                 </CardBody>
                 <Divider />
                 <CardFooter >
-                    <Button
-                        onClick={() => handleLike()}
-                        className="flex items-center space-x-1 pr-4 mr-2 text-black dark:text-white"
-                        radius="full"
-                        color="default"
-                        variant="flat"
-                    >
-                        {liked ? <HandThumbUpSolidIcon className="h-8 text-blue-500" /> : <HandThumbUpOutlineIcon className="h-8 text-gray-500" />}
-                        <span>{likes}</span>
-                    </Button>
-                    <button onClick={() => handleDislike()} className="flex items-center space-x-2">
-                        {disliked ? <HandThumbDownSolidIcon className="h-8 text-red-500" /> : <HandThumbDownOutlineIcon className="h-8 text-gray-500" />}
-                        <span>{dislikes}</span>
-                    </button>
+                    <div className="flex ">
+                        <Button
+                            onClick={() => handleLike()}
+                            className="flex items-center space-x-1 pr-4 mr-2 text-black dark:text-white"
+                            radius="full"
+                            color="default"
+                            variant="flat"
+                        >
+                            {liked ? <HandThumbUpSolidIcon className="h-8 text-blue-500" /> : <HandThumbUpOutlineIcon className="h-8 text-gray-500" />}
+                            <span>{likes}</span>
+                        </Button>
+                        <button onClick={() => handleDislike()} className="flex items-center space-x-2">
+                            {disliked ? <HandThumbDownSolidIcon className="h-8 text-red-500" /> : <HandThumbDownOutlineIcon className="h-8 text-gray-500" />}
+                            <span>{dislikes}</span>
+                        </button>
+                    </div>
+                    <span className="ml-auto mr-2 transition-colors duration-200   cursor-pointer backdrop-blur-md bg-opacity-30">
+                        {
+                            (addList) ?
+                                <HiMinusCircle onClick={handleAddToList} className="text-2xl text-[#C8CFA0]   hover:text-blue-500  dark:hover:text-blue-500" /> :
+                                <BsPatchPlusFill onClick={handleAddToList} className="text-2xl text-[#78ABA8]    hover:text-blue-500" />
+                        }
+                    </span>
                 </CardFooter>
             </Card>
         </>

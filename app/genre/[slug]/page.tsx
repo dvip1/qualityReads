@@ -27,6 +27,7 @@ export interface PostData {
     postId: ObjectId;
     userLiked: boolean;
     userDisliked: boolean;
+    isPostInList: boolean
 }
 export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -76,6 +77,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     image={data.user.image}
                                     userLiked={data.userLiked}
                                     userDisliked={data.userDisliked}
+                                    isPostInList={data.isPostInList}
                                 />
                             ))}
                         </div>

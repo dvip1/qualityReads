@@ -32,6 +32,8 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
             const user = await Userscollection.findOne({ _id: post.user_id }, { projection: { name: 1, image: 1 } });
             const userLiked = !!(await Postcollection.countDocuments({ _id: post._id, liked_by: { $in: [CurrentUserData._id] } }));
             const userDisliked = !!(await Postcollection.countDocuments({ _id: post._id, disliked_by: { $in: [CurrentUserData._id] } }));
+            const isPostInList = !!(await Userscollection.findOne({ _id: CurrentUserData._id, myList: { $in: [post._id] } }));
+
             return {
                 user: user ? { name: user.name, image: user.image } : { name: '', image: '' },
                 url: post.url,
@@ -42,7 +44,8 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
                 userLiked,
                 userDisliked,
                 content: post.content,
-                postId: post._id
+                postId: post._id,
+                isPostInList
             };
         }));
         console.log(`Sending User data: ${JSON.stringify(postsWithUserData)}`)

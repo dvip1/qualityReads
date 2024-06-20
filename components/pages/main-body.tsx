@@ -1,5 +1,5 @@
 "use client"
-import MainCards, { SmallCards, SmallCardsType } from "@/components/ui/main-cards";
+import { SmallCards, SmallCardsType } from "@/components/ui/main-cards";
 import { PostData } from "@/app/genre/[slug]/page";
 import PostComponent from "@/components/posts/postComponent";
 import { BiSolidHomeCircle } from "react-icons/bi";
@@ -49,6 +49,7 @@ export default function MainBody() {
                                 image={data.user.image}
                                 userLiked={data.userLiked}
                                 userDisliked={data.userDisliked}
+                                isPostInList={data.isPostInList}
                             />
                         ))}
                     </div>
