@@ -5,6 +5,7 @@ import { FaPenToSquare } from "react-icons/fa6";
 import CreatePost, { postDataTypes } from "./createPost";
 import { parseHashtags, getHashtagsArray } from "./utils";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+
 import { primaryCategory, SelfImprovement, hobbies, lifestyle, categoryTypes } from "./data"
 const PostComponent = () => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -13,7 +14,7 @@ const PostComponent = () => {
     const [url, setUrl] = useState('');
     const [primaryValue, setPrimaryValue] = useState<categoryTypes[]>(lifestyle)
     const [isSelected, setIsSelected] = useState(true);
-
+    
     const [selectedValue, setSelectedValue] = useState('');
     const handleButtonClick = () => {
         console.log(title);
@@ -36,7 +37,8 @@ const PostComponent = () => {
         }
     };
 
-    const handleFormSub = async () => {
+    const handleFormSub = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
         const data: postDataTypes = {
             title: title,
             content: content,
@@ -72,7 +74,7 @@ const PostComponent = () => {
             >
                 <ModalContent>
                     {(onClose) => (
-                        <form >
+                        <form onSubmit={handleFormSub}>
                             <ModalHeader className="flex flex-col gap-1"> {title || "change title !!"} </ModalHeader>
                             <ModalBody>
                                 <Textarea
@@ -104,6 +106,7 @@ const PostComponent = () => {
                                     className="max-w-xs"
                                     defaultItems={primaryCategory}
                                     onInputChange={(e) => handleAutoCompleteChange(e)}
+                                    isRequired
                                 >
                                     {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
                                 </Autocomplete>
@@ -116,6 +119,7 @@ const PostComponent = () => {
                                     defaultItems={primaryValue}
                                     isDisabled={isSelected}
                                     onInputChange={(e) => setSelectedValue(e)}
+                                    isRequired
                                 >
                                     {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
                                 </Autocomplete>
@@ -125,7 +129,7 @@ const PostComponent = () => {
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Close
                                 </Button>
-                                <Button color="primary" type="submit" onClick={handleFormSub}>
+                                <Button color="primary" type="submit" >
                                     Post
                                 </Button>
                             </ModalFooter>

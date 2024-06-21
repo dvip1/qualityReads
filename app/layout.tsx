@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react"; // Import SessionProvider
 import { Inter } from "next/font/google";
 import { createOptimizedIndexes } from "@/lib/createIndexes";
+import { Providers } from "./providers";
 import "./globals.css";
 createOptimizedIndexes();
 const inter = Inter({ subsets: ["latin"] });
@@ -20,10 +21,12 @@ export default function RootLayout({
   session?: any; // Type accordingly based on your session object's structure
 }>) {
   return (
-    <html lang="en" className=" light dark:dark text-foreground bg-background ">
+    <html lang="en" className=" light dark:dark  ">
       <SessionProvider session={session}>{/* Wrap children with SessionProvider */}
-        <body className={`${inter.className} bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0] dark:bg-dark-background dark:bg-blend-multiply`}>
-          {children}
+        <body className={`${inter.className} text-foreground  bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0] dark:bg-black/90 dark:bg-blend-multiply`}>
+          <Providers>
+            {children}
+          </Providers>
         </body>
       </SessionProvider>
     </html>

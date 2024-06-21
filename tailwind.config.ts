@@ -2,6 +2,7 @@ import { nextui } from '@nextui-org/theme';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,18 +11,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "dark-background": "linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.25) 200%)",
-      },
-      backgroundBlendMode: {
-        'multiply': 'multiply',
-      },
     },
   },
   plugins: [nextui({
+    prefix: "nextui",
+    defaultTheme: "light",
+    defaultExtendTheme: "light",
     themes: {
       light: {
         colors: {
@@ -30,9 +25,9 @@ const config: Config = {
       },
       dark: {
         colors: {
-          background: '#31363F',
+          background: '#373A40',
         }
-      }
+      },
     }
   })]
   ,

@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import fetchHomeData from "@/utils/fetchHome";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
+import { Bounce, ToastContainer } from "react-toastify";
+import { ThemeSwitcher } from "../ui/ThemeSwitcher";
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
@@ -26,11 +28,25 @@ export default function MainBody() {
 
     return (
         <div className="flex flex-col items-center w-full min-h-screen pb-10">
+
             <div className="max-w-full flex justify-center">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <span className="flex justify-center items-center">
                         <PostComponent />
                     </span>
+                    <ToastContainer
+                        position="bottom-center"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        transition={Bounce}
+                        theme="light"
+                    />
                     <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                         <BiSolidHomeCircle className="mr-2" /> Home
                     </h1>

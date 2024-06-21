@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Divider, Image, Link } from "@nextui-org/react";
 import { HandThumbUpIcon as HandThumbUpOutlineIcon, HandThumbDownIcon as HandThumbDownOutlineIcon } from "@heroicons/react/24/outline";
 import { HandThumbUpIcon as HandThumbUpSolidIcon, HandThumbDownIcon as HandThumbDownSolidIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
@@ -7,7 +7,10 @@ import { LikePostTypes, LikePost, DislikePost, DislikePostTypes } from "@/utils/
 import { ObjectId } from "mongodb";
 import { BsPatchPlusFill } from "react-icons/bs";
 import { HiMinusCircle } from "react-icons/hi";
+import { Bounce, ToastContainer, toast } from 'react-toastify';
 import AddRemoveFromList, { MyListTypes } from "@/utils/addToList";
+import 'react-toastify/ReactToastify.css';
+import { useTheme } from "next-themes";
 export interface SmallCardsType {
     _id?: ObjectId
     url: string
@@ -25,8 +28,18 @@ export interface SmallCardsType {
 function removeHashtags(text: string) {
     return text.replace(/#[^\s#]+/g, '').trim();
 }
-
+function getDomainFromUrl(url: string) {
+    try {
+        const anchor = new URL(url);
+        return anchor.hostname;
+    }
+    catch {
+        return ""
+    }
+}
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
+    const { theme } = useTheme();
+    console.log(`This is theme ${theme}`);
     const [liked, setLiked] = useState(props.userLiked);
     const [disliked, setDisliked] = useState(props.userDisliked);
     const [likes, setLikes] = useState(props.likes);
@@ -67,7 +80,16 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         }
     };
     const handleLike = async () => {
-
+        toast('🎉 Post created successfully!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: theme === 'dark' ? "dark" : "light",
+        });
         if (liked) {
             const sendObject: LikePostTypes = {
                 like: false,
@@ -114,7 +136,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
     return (
         <>
-            <Card className="max-w-[350px]  my-2 " isBlurred >
+            <Card className="max-w-[350px]  my-2 "  >
                 <CardHeader className=" flex gap-3 ">
                     <Image
                         alt="nextui logo"
@@ -134,12 +156,10 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                     <p className="text-small text-black/60 dark:text-white/60">{removeHashtags(props.content)}</p>
 
                     <Link
-                        isExternal
-                        showAnchorIcon
                         href={props.url}
-                        className="text-blue-500"
+                        showAnchorIcon
                     >
-                        {props.url}
+                        {getDomainFromUrl(props.url)}
                     </Link>
                     <div className="flex flex-wrap mt-auto">
                         {
