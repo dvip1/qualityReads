@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 createOptimizedIndexes();
 const inter = Inter({ subsets: ["latin"] });
+import 'react-toastify/ReactToastify.css';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,8 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en" className=" light dark:dark  ">
       <SessionProvider session={session}>{/* Wrap children with SessionProvider */}
-        <body className={`${inter.className} text-foreground  bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0] dark:bg-black/90 dark:bg-blend-multiply`}>
-          <Providers>
+      <body className={`${inter.className} text-foreground  bg-gradient-to-t from-[#cfd9df] to-[#e2ebf0]  dark:bg-blend-multiply dark:bg-[#1b1a1b]`}>
+      <Providers>
             {children}
           </Providers>
         </body>

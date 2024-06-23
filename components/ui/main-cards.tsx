@@ -7,9 +7,8 @@ import { LikePostTypes, LikePost, DislikePost, DislikePostTypes } from "@/utils/
 import { ObjectId } from "mongodb";
 import { BsPatchPlusFill } from "react-icons/bs";
 import { HiMinusCircle } from "react-icons/hi";
-import { Bounce, ToastContainer, toast } from 'react-toastify';
 import AddRemoveFromList, { MyListTypes } from "@/utils/addToList";
-import 'react-toastify/ReactToastify.css';
+import { toast } from "react-toastify";
 import { useTheme } from "next-themes";
 export interface SmallCardsType {
     _id?: ObjectId
@@ -38,14 +37,13 @@ function getDomainFromUrl(url: string) {
     }
 }
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
-    const { theme } = useTheme();
-    console.log(`This is theme ${theme}`);
     const [liked, setLiked] = useState(props.userLiked);
     const [disliked, setDisliked] = useState(props.userDisliked);
     const [likes, setLikes] = useState(props.likes);
     const [dislikes, setDislikes] = useState(props.dislikes);
     const [addList, setAddList] = useState(props.isPostInList);
     const propId = props._id;
+    const { theme } = useTheme();
     const handleDislike = async () => {
         if (disliked) {
             const sendObject: DislikePostTypes = {
@@ -80,16 +78,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         }
     };
     const handleLike = async () => {
-        toast('🎉 Post created successfully!', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: theme === 'dark' ? "dark" : "light",
-        });
         if (liked) {
             const sendObject: LikePostTypes = {
                 like: false,
@@ -128,18 +116,38 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         if (addList) {
             setAddList(false);
             propId && AddRemoveFromList({ postId: propId });
+            toast(' 📑 Removed from List!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: theme === 'dark' ? "dark" : "light",
+            });
         }
         else {
             setAddList(true);
             propId && AddRemoveFromList({ postId: propId });
+            toast(' 📑 Added to List!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: theme === 'dark' ? "dark" : "light",
+            });
         };
     }
     return (
         <>
-            <Card className="max-w-[350px]  my-2 "  >
+            <Card className="max-w-[350px]  my-2 " isBlurred >
                 <CardHeader className=" flex gap-3 ">
                     <Image
-                        alt="nextui logo"
+                        alt={props.name[0] || "D"}
                         height={40}
                         radius="sm"
                         src={props.image}
@@ -158,6 +166,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                     <Link
                         href={props.url}
                         showAnchorIcon
+                        target="_blank"
                     >
                         {getDomainFromUrl(props.url)}
                     </Link>

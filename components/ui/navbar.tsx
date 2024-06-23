@@ -8,18 +8,33 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, Navba
 import { signOut } from "next-auth/react"
 import { FaLeaf } from "react-icons/fa";
 import { usePathname } from "next/navigation";
+import { FaSignOutAlt } from "react-icons/fa";
+import { IoSettings } from "react-icons/io5";
+import { MdLightMode, MdNightlight } from "react-icons/md";
+import { useTheme } from "next-themes";
+import { FaBook } from "react-icons/fa";
+
 export default function NavBar() {
+    const { theme, setTheme } = useTheme();
+    const iconClass = "text-xl text-default-500 pointer-events-none flex-shrink-0"
+    const themeIcon = (theme == "dark") ? <MdLightMode className={iconClass} /> : <MdNightlight className={iconClass} />;
     const router = useRouter();
     const pathname = usePathname();
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isActive, setIsActive] = useState(0);
+    const handleThemeSwitch = () => {
+        (theme == "dark") ? setTheme("light") : setTheme("dark");
+    }
     const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
     };
     const handleProfileClick = () => {
         router.push("/profile");
+    }
+    const handleListClick = () => {
+        router.push("/reading-list")
     }
     useEffect(() => {
         console.log(`Current Path name: ${pathname}`);
@@ -78,7 +93,24 @@ export default function NavBar() {
                             <p className="font-semibold">Signed in as</p>
                             <p className="font-semibold">{session?.user?.email}</p>
                         </DropdownItem>
-                        <DropdownItem key="logout" color="danger" onClick={handleSignOut}>
+                        <DropdownItem key="my-list"
+                            onClick={handleListClick}
+                            startContent={<FaBook className={iconClass} />}
+                        >
+                            My List
+                        </DropdownItem>
+                        <DropdownItem key="settings"
+                            onClick={handleProfileClick}
+                            startContent={<IoSettings className={iconClass} />}
+                        >
+                            Settings
+                        </DropdownItem>
+
+                        <DropdownItem key="logout"
+                            color="danger"
+                            onClick={handleSignOut}
+                            startContent={<FaSignOutAlt className={iconClass} />}
+                        >
                             Log Out
                         </DropdownItem>
                     </DropdownMenu>

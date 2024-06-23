@@ -1,0 +1,9 @@
+/* Define a light mode gradient */
+.light-mode-gradient {
+    background-image: linear-gradient(to right, #6ee7b7, #3b82f6);
+}
+
+/* Define a dark mode gradient */
+.dark-mode-gradient {
+    background-image: linear-gradient(to right, #93c5fd, #a78bfa);
+}

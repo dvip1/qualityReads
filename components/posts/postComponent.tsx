@@ -5,6 +5,8 @@ import { FaPenToSquare } from "react-icons/fa6";
 import CreatePost, { postDataTypes } from "./createPost";
 import { parseHashtags, getHashtagsArray } from "./utils";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import { useTheme } from "next-themes";
 
 import { primaryCategory, SelfImprovement, hobbies, lifestyle, categoryTypes } from "./data"
 const PostComponent = () => {
@@ -14,7 +16,8 @@ const PostComponent = () => {
     const [url, setUrl] = useState('');
     const [primaryValue, setPrimaryValue] = useState<categoryTypes[]>(lifestyle)
     const [isSelected, setIsSelected] = useState(true);
-    
+    const { theme } = useTheme();
+
     const [selectedValue, setSelectedValue] = useState('');
     const handleButtonClick = () => {
         console.log(title);
@@ -50,8 +53,16 @@ const PostComponent = () => {
         setTitle("");
         setContent("");
         setUrl("");
-
-        console.log("complete!")
+        toast('🎉 Post created successfully!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: theme === 'dark' ? "dark" : "light",
+        });
         onOpenChange();
     }
 
