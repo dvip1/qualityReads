@@ -8,7 +8,6 @@ import fetchHomeData from "@/utils/fetchHome";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Bounce, ToastContainer } from "react-toastify";
-import { ThemeSwitcher } from "../ui/ThemeSwitcher";
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages

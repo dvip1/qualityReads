@@ -11,7 +11,9 @@ const fetchUserData = cache(async () => {
         const collection = db.collection("users");
         const UserData = await collection.findOne({ email: session?.user?.email }) as UserTypes;
         console.log(`Fetching user Data: ${UserData}`);
-        return UserData;
+        return JSON.parse(
+            JSON.stringify(UserData)
+        );
     }
     catch (e) {
         throw new Error(`Error occured while fetching user Data: ${e}`);

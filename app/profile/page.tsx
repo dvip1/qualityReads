@@ -11,10 +11,8 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import fetchUserData from "@/utils/fetchUserData";
 import { useEffect, useState } from "react";
-import { IoMdArrowForward } from "react-icons/io";
-import { FaHeart } from "react-icons/fa";
-import { IoMdHeartDislike } from "react-icons/io";
-import { FaBook } from "react-icons/fa";
+import { Link } from "@nextui-org/react";
+import { AnchorIcon } from "./ui-client";
 import "@/app/profile/custom.css"
 interface ProfileHeaderType {
     url: string
@@ -68,16 +66,30 @@ const Profile = async () => {
 
                     <h2 className="mt-8 scroll-m-20 text-2xl font-semibold tracking-tight">Interactions</h2>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Your Posts</p>
+                        <Link
+                            className="text-black/60 dark:text-white/60 text-md mr-1"
+                            showAnchorIcon
+                            href="/profile/my-posts"
+                        >Your Posts</Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center ">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Liked Posts </p>
+                        <Link className="text-black/60 dark:text-white/60 text-md mr-1"
+                            showAnchorIcon
+                            href="/profile/liked"
+                        >Liked Posts </Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Disliked Posts </p>
+                        <Link
+                            className="text-black/60 dark:text-white/60 text-md mr-1"
+                            showAnchorIcon
+                            href="/profile/disliked"
+                        >Disliked Posts </Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Reading List </p>
+                        <Link className="text-black/60 dark:text-white/60 text-md mr-1"
+                            showAnchorIcon
+                            href="/reading-list"
+                        >Reading List </Link>
                     </div>
 
                     <div className="mt-8">

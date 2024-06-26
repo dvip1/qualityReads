@@ -56,7 +56,7 @@ export default async function FetchReadingList(props: ReadingTypes) {
             };
         }));
         // Return the posts and the total number of posts
-        return JSON.parse(JSON.stringify({ posts: postsWithUserData, total: totalPosts }));
+            return JSON.parse(JSON.stringify({ posts: postsWithUserData, total: totalPosts }));
     }
     catch (e) {
         throw new Error(`Error occured while fetching Reading List ${e}`);
