@@ -11,10 +11,8 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import fetchUserData from "@/utils/fetchUserData";
 import { useEffect, useState } from "react";
-import { IoMdArrowForward } from "react-icons/io";
-import { FaHeart } from "react-icons/fa";
-import { IoMdHeartDislike } from "react-icons/io";
-import { FaBook } from "react-icons/fa";
+import { Link } from "@nextui-org/react";
+import { useSession } from "next-auth/react";
 import "@/app/profile/custom.css"
 interface ProfileHeaderType {
     url: string
@@ -26,20 +24,14 @@ export interface UserTypes {
     email: string;
     image: string;
     emailVerified?: Date | null;
-    myList?: string[] | null;
+    myList?: ObjectId[] | null;
 }
 
-const Profile = async () => {
-    const [userData, setUserData] = useState<UserTypes>();
+const Profile = () => {
+    const { data: session, status } = useSession()
     const iconClass = "text-xl text-default-500 pointer-events-none flex-shrink-0"
-    useEffect(() => {
-        const getUserData = async () => {
-            const user = await fetchUserData();
-            setUserData(user);
-        }
-        getUserData();
-    }, [])
-    if (!userData) return <Loading />;
+
+    if (status === "loading") return <Loading />;
     const handleSignOut = async () => {
         await signOut();
         console.log("Signed Out!")
@@ -50,10 +42,10 @@ const Profile = async () => {
             <div className="min-h-screen flex flex-col items-center font-sans pb-4 ">
                 <NavBar />
                 <div>
-                    <ProfileHeader url={userData?.image} />
+                    <ProfileHeader url={session?.user?.image || ""} />
                 </div>
                 <h1 className="scroll-m-20 text-3xl font-bold tracking-tight lg:text-4xl text-blue-800/70 dark:text-blue-300/80 ">
-                    Welcome, {userData?.name}
+                    Welcome, {session?.user?.name}
                 </h1>
                 <div className="body max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 min-w-fit">
                     <div className="appearence flex gap-4 w-full">
@@ -68,16 +60,29 @@ const Profile = async () => {
 
                     <h2 className="mt-8 scroll-m-20 text-2xl font-semibold tracking-tight">Interactions</h2>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Your Posts</p>
+                        <Link
+                            className="text-black/60 dark:text-white/60 text-md mr-1"
+                            href="/profile/my-posts"
+                            showAnchorIcon
+                        >My Posts</Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center ">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Liked Posts </p>
+                        <Link className="text-black/60 dark:text-white/60 text-md mr-1"
+                            href="/profile/liked"
+                            showAnchorIcon
+                        >Liked Posts </Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Disliked Posts </p>
+                        <Link className="text-black/60 dark:text-white/60 text-md mr-1"
+                            href="/profile/disliked"
+                            showAnchorIcon
+                        >Disliked Posts </Link>
                     </div>
                     <div className="appearence flex  w-fit mt-4 items-center">
-                        <p className="text-black/60 dark:text-white/60 text-md mr-1">Reading List </p>
+                        <Link className="text-black/60 dark:text-white/60 text-md mr-1"
+                            href="/reading-list"
+                            showAnchorIcon
+                        >Reading List </Link>
                     </div>
 
                     <div className="mt-8">
@@ -106,6 +111,7 @@ const ProfileHeader: React.FC<ProfileHeaderType> = (props) => {
             </div>
         </>
     )
-}
+};
+
 
 export default Profile;
