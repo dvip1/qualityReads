@@ -51,8 +51,9 @@ export default function Page({ params }: { params: { slug: string } }) {
                             'Content-Type': 'application/json'
                         }
                     });
-                    console.log(response.status)
+                    console.log(`This is somethin here: ${response.data.posts}`)
                     setMainData(response.data.posts);
+
                     setTotalPages(Math.ceil(response.data.total / mainParams.limit))
                 } catch (error) {
                     console.error("There was a problem with the axios request:", error);
@@ -73,7 +74,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                 {stringMapping[params.slug]}
                             </h1>
                             <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
-                                {mainData.map((data, index) => (
+                                {(mainData.length) ? mainData.map((data, index) => (
                                     <SmallCards
                                         key={index}
                                         _id={data.postId}
@@ -89,7 +90,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                         userDisliked={data.userDisliked}
                                         isPostInList={data.isPostInList}
                                     />
-                                ))}
+                                )) : <p>Nothing to see here</p>}
                             </div>
                         </div>
                     </div>

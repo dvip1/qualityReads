@@ -3,7 +3,8 @@ import clientPromise from '@/lib/db';
 import { auth } from '@/auth';
 import { UserTypes } from '@/app/profile/page';
 import { ObjectId } from 'mongodb';
-
+import Trending from '@/utils/Trending';
+import { getRedisClient } from '@/lib/redis';
 export interface postDataTypes {
     url: string
     title: string
@@ -23,7 +24,6 @@ const CreatePost = async (postData: postDataTypes) => {
         const Userscollection = db.collection('users');
         const UserData = await Userscollection.findOne({ email: session?.user?.email }) as UserTypes;
         const user_id = UserData._id;
-
         const insertData = {
             ...postData,
             "user_id": user_id,
@@ -33,7 +33,12 @@ const CreatePost = async (postData: postDataTypes) => {
             "liked_by": [],
             "disliked_by": []
         }
-        await Postcollection.insertOne(insertData);
+        const redisClient = await getRedisClient()
+        const TrendingObject = new Trending(redisClient);
+        const result = await Postcollection.insertOne(insertData);
+        const insertedPostId = result.insertedId;
+        TrendingObject.addNewPost(insertedPostId.toString(), new Date());
+        await TrendingObject.updateTag(postData.tags).then((e) => console.log(`something here ${e}`));
     } catch (e) {
         console.error(`Error occurred ${e}`);
         throw new Error(`Error occurred during creating Post ${e}`)

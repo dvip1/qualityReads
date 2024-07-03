@@ -2,6 +2,8 @@
 import clientPromise from "@/lib/db";
 import { ObjectId } from "mongodb";
 import fetchUserData from "./fetchUserData";
+import Trending from "./Trending";
+import { getRedisClient } from "@/lib/redis";
 export interface LikePostTypes {
     like: boolean
     postId: ObjectId | undefined
@@ -12,6 +14,7 @@ export interface DislikePostTypes {
 }
 const LikePost = async (props: LikePostTypes) => {
     try {
+        if (!props.postId) return null;
         const client = await clientPromise;
         const db = client.db();
         const Postcollection = db.collection('posts');
@@ -26,7 +29,9 @@ const LikePost = async (props: LikePostTypes) => {
             updateOperation as any,
             { returnDocument: 'after' }
         );
-
+        const redisClient = await getRedisClient()
+        const TrendingObject = new Trending(redisClient);
+        if (props.like) { TrendingObject.updatePostScore("trending_daily", props.postId.toString()) }
         if (!updatedPost) {
             throw new Error("Post not found");
         }
