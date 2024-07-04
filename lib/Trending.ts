@@ -53,10 +53,14 @@ class Trending {
         return newScore;
     };
 
-    public async getTrendingItems(timeSpan: 'hourly' | 'daily' = 'daily', n: number = 10): Promise<Array<string | number>> {
-        const key = timeSpan === 'hourly' ? 'trending_hourly' : 'trending_daily';
-        return await this.client.zrange(key, '-' + n, -1, 'REV', 'WITHSCORES');
-    }
+    public async getTrendingItemsWithoutScores(timeSpan: 'tags' | 'daily' = 'daily', n: number = 10): Promise<Array<string>> {
+        const key = timeSpan === 'tags' ? 'tags' : 'trending_daily';
+        // Fetch the top n items in descending order by score but only return the members, not the scores
+        const itemsWithScores = await this.client.zrevrange(key, 0, n - 1, 'WITHSCORES');
+        console.log(JSON.stringify(itemsWithScores));
+        const itemsWithoutScores = itemsWithScores.filter((_, index) => index % 2 === 0);
 
+        return itemsWithoutScores;
+    }
 }
 export default Trending;

@@ -2,7 +2,7 @@
 import clientPromise from "@/lib/db";
 import { ObjectId } from "mongodb";
 import fetchUserData from "./fetchUserData";
-import Trending from "./Trending";
+import Trending from "@/lib/Trending";
 import { getRedisClient } from "@/lib/redis";
 export interface LikePostTypes {
     like: boolean

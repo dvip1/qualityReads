@@ -3,7 +3,7 @@ import clientPromise from '@/lib/db';
 import { auth } from '@/auth';
 import { UserTypes } from '@/app/profile/page';
 import { ObjectId } from 'mongodb';
-import Trending from '@/utils/Trending';
+import Trending from '@/lib/Trending';
 import { getRedisClient } from '@/lib/redis';
 export interface postDataTypes {
     url: string

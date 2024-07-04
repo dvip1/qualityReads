@@ -13,6 +13,7 @@ interface PostList {
     likedByUser?: boolean
     dislikedByUser?: boolean
     sortBy?: 'liked' | 'recent' | 'disliked';
+    postIdInArray: string[]
 }
 interface Query {
     category?: string;
@@ -20,6 +21,8 @@ interface Query {
     user_id?: ObjectId;
     liked_by?: ObjectId;
     disliked_by?: ObjectId;
+    _id?: ObjectId | { $in: ObjectId[] }; // Allow _id to be either an ObjectId or have the $in operator with an array of ObjectId
+
 }
 
 export async function POST(req: Request) {
@@ -31,6 +34,9 @@ export async function POST(req: Request) {
         const UserCollection = db.collection("users");
         const PostCollection = db.collection("posts");
         const UserData = await UserCollection.findOne({ email: session?.user?.email }) as UserTypes;
+        if (!UserData) {
+            return null; // Early return if user data is not found
+        }
         const query: Query = {};
 
         if (filters.category) query.category = filters.category;
@@ -38,12 +44,13 @@ export async function POST(req: Request) {
         if (filters.usersPost) query.user_id = new ObjectId(UserData._id);
         if (filters.likedByUser) query.liked_by = new ObjectId(UserData._id);
         if (filters.dislikedByUser) query.disliked_by = new ObjectId(UserData._id);
-
+        if (filters.postIdInArray && filters.postIdInArray.length > 0) {
+            query._id = { $in: filters.postIdInArray.map(id => new ObjectId(id)) };
+        };
         const user = await UserCollection.findOne({ _id: UserData._id });
 
-        // If the user document or the myList field does not exist, return null
-        if (!user || !user.myList) {
-            return null;
+        if (!user) {
+            return Response.json({ "message": "No user found" }, { status: 401 });
         }
 
         const posts = await PostCollection.find(query)
@@ -70,6 +77,7 @@ export async function POST(req: Request) {
         }));
         return Response.json({ posts: postsWithUserData, total: totalPostsCount }, { status: 201 });
     } catch (err) {
+        console.error("Error in POST function:", err);
         return Response.json(`Something bad happened ${err}`);
     }
 }
