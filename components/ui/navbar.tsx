@@ -119,18 +119,18 @@ export default function NavBar() {
             </NavbarContent>
             <NavbarMenu>
                 <NavbarMenuItem >
-                    <Link className="w-full" href="#" size="lg">
+                    <Link className="w-full" href="/" size="lg">
                         Home
                     </Link>
                 </NavbarMenuItem>
                 <NavbarMenuItem >
-                    <Link className="w-full" href="#" size="lg">
-                        Reading List
+                    <Link className="w-full" href="/genre" size="lg">
+                        Genre
                     </Link>
                 </NavbarMenuItem>
                 <NavbarMenuItem >
-                    <Link className="w-full" href="#" size="lg">
-                        About
+                    <Link className="w-full" href="/explore" size="lg">
+                        Explore
                     </Link>
                 </NavbarMenuItem>
             </NavbarMenu>
