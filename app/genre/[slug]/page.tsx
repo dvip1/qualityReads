@@ -11,6 +11,7 @@ import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { ObjectId } from "mongodb";
+import SkeletonCustom from "@/components/ui/skeleton-custom";
 interface UserTypes {
     name: string;
     image: string;
@@ -32,6 +33,7 @@ export interface PostData {
 export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
+    const [isLoading, setIsLoading] = useState(true); // Added state for loading
 
     if (!isValidSlug(params.slug))
         notFound();
@@ -40,14 +42,23 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [mainData, setMainData] = useState<PostData[]>([]);
     useEffect(() => {
         const fetchData = async () => {
-            const data = {
-                category: title,
-                page: currentPage,
-                limit: 15,
-            };
-            const result = await fetchGenreData(data);
-            setMainData(result.posts);
-            setTotalPages(Math.ceil(result.total / data.limit)); // 
+            try {
+                setIsLoading(true);
+                const data = {
+                    category: title,
+                    page: currentPage,
+                    limit: 15,
+                };
+                const result = await fetchGenreData(data);
+                setMainData(result.posts);
+                setTotalPages(Math.ceil(result.total / data.limit));
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+            finally {
+                setIsLoading(false);
+            }
+
         };
         fetchData();
     }, [title, currentPage]);
@@ -63,7 +74,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                             {title}
                         </h1>
                         <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
-                            {mainData.map((data, index) => (
+                            {isLoading ? <span> <SkeletonCustom />
+                            </span> : mainData?.map((data, index) => (
                                 <SmallCards
                                     key={index}
                                     _id={data.postId}

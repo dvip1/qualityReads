@@ -8,19 +8,28 @@ import fetchHomeData from "@/utils/fetchHome";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Bounce, ToastContainer } from "react-toastify";
+import SkeletonCustom from "../ui/skeleton-custom";
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [mainData, setMainData] = useState<PostData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         const fetchData = async () => {
-            const data = {
-                page: currentPage,
-                limit: 15,
-            };
-            const result = await fetchHomeData(data);
-            setMainData(result.posts);
-            setTotalPages(Math.ceil(result.total / data.limit)); // 
+            try {
+                setIsLoading(true);
+                const data = {
+                    page: currentPage,
+                    limit: 15,
+                };
+                const result = await fetchHomeData(data);
+                setMainData(result.posts);
+                setTotalPages(Math.ceil(result.total / data.limit)); //  
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchData();
     }, [currentPage]);
@@ -50,7 +59,8 @@ export default function MainBody() {
                         <BiSolidHomeCircle className="mr-2" /> Home
                     </h1>
                     <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
-                        {mainData.map((data, index) => (
+                        {isLoading ? <span> <SkeletonCustom />
+                        </span> : mainData?.map((data, index) => (
                             <SmallCards
                                 key={index}
                                 _id={data.postId}

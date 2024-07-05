@@ -19,6 +19,12 @@ const LikePost = async (props: LikePostTypes) => {
         const db = client.db();
         const Postcollection = db.collection('posts');
         const increment = props.like ? 1 : -1;
+
+        const redisClient = await getRedisClient()
+        const TrendingObject = new Trending(redisClient);
+        if (props.like) { TrendingObject.updatePostScore("trending_daily", props.postId.toString()) }
+        else TrendingObject.unlikePost("trending_daily", props.postId.toString());
+        
         const userData = await fetchUserData();
         const updateOperation: { $inc: { likes: number }, $push?: { liked_by?: ObjectId }, $pull?: { liked_by?: ObjectId } } = props.like
             ? { $inc: { likes: increment }, $push: { liked_by: userData._id } }
@@ -29,9 +35,6 @@ const LikePost = async (props: LikePostTypes) => {
             updateOperation as any,
             { returnDocument: 'after' }
         );
-        const redisClient = await getRedisClient()
-        const TrendingObject = new Trending(redisClient);
-        if (props.like) { TrendingObject.updatePostScore("trending_daily", props.postId.toString()) }
         if (!updatedPost) {
             throw new Error("Post not found");
         }

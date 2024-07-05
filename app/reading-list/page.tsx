@@ -8,20 +8,30 @@ import FetchReadingList from "@/utils/fetchReadingList";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import ProtectedRoute from "@/utils/protectedRoute";
+import SkeletonCustom from "@/components/ui/skeleton-custom";
+
 export default function Page() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [mainData, setMainData] = useState<PostData[]>([]);
+    const [isLoading, setIsLoading] = useState(true); // Added state for loading
     useEffect(() => {
         const fetchData = async () => {
-            const data = {
-                page: currentPage,
-                limit: 15,
-            };
-            const result = await FetchReadingList(data);
-            console.log(result);
-            setMainData(result.posts);
-            setTotalPages(Math.ceil(result.total / data.limit)); // 
+            try {
+                const data = {
+                    page: currentPage,
+                    limit: 15,
+                };
+                const result = await FetchReadingList(data);
+                console.log(result);
+                setMainData(result.posts);
+                setTotalPages(Math.ceil(result.total / data.limit));
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+            finally {
+                setIsLoading(false);
+            }
         };
         fetchData();
     }, [currentPage]);
@@ -37,7 +47,8 @@ export default function Page() {
                                 <FaBook className="mr-2" /> My List
                             </h1>
                             <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
-                                {mainData?.map((data, index) => (
+                                {isLoading ? <span> <SkeletonCustom />
+                                </span> : mainData?.map((data, index) => (
                                     <SmallCards
                                         key={index}
                                         _id={data.postId}

@@ -8,7 +8,7 @@ import { PostData } from "../genre/[slug]/page";
 import axios from "axios";
 import FetchTrendingPost from "@/utils/fetchTrendingPost";
 import { SmallCards } from "@/components/ui/main-cards";
-import Loading from "../loading";
+import SkeletonCustom from "@/components/ui/skeleton-custom";
 export default function Page() {
     const [tags, setTags] = useState<string[]>();
     const [currentPage, setCurrentPage] = useState(1);
@@ -75,7 +75,8 @@ export default function Page() {
                                     Trending <FaArrowTrendUp className="ml-2" />
                                 </h2>
                                 <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
-                                    {isLoading ? <Loading /> : trendingData && trendingData.map((data, index) => (
+                                    {isLoading ? <span> <SkeletonCustom />
+                                    </span> : trendingData && trendingData.map((data, index) => (
                                         <SmallCards
                                             key={index}
                                             _id={data.postId}

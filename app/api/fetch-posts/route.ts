@@ -24,7 +24,6 @@ interface Query {
     _id?: ObjectId | { $in: ObjectId[] }; // Allow _id to be either an ObjectId or have the $in operator with an array of ObjectId
 
 }
-
 export async function POST(req: Request) {
     try {
         const filters: PostList = await req.json();
@@ -47,17 +46,23 @@ export async function POST(req: Request) {
         if (filters.postIdInArray && filters.postIdInArray.length > 0) {
             query._id = { $in: filters.postIdInArray.map(id => new ObjectId(id)) };
         };
-        const user = await UserCollection.findOne({ _id: UserData._id });
 
-        if (!user) {
-            return Response.json({ "message": "No user found" }, { status: 401 });
+        let posts;
+        if (filters.postIdInArray && filters.postIdInArray.length > 0) {
+            // Fetch posts without sorting by created_at
+            posts = await PostCollection.find(query).toArray();
+            // Reorder posts to match the order in postIdInArray
+            const idOrder = filters.postIdInArray.map(id => id.toString());
+            posts.sort((a, b) => idOrder.indexOf(a._id.toString()) - idOrder.indexOf(b._id.toString()));
+        } else {
+            // Apply sorting by created_at if postIdInArray is not provided
+            posts = await PostCollection.find(query)
+                .sort({ created_at: -1 }) // Sort by creation date in descending order
+                .skip(filters.limit * (filters.page - 1)) // Calculate the number of documents to skip for pagination
+                .limit(filters.limit)
+                .toArray();
         }
 
-        const posts = await PostCollection.find(query)
-            .sort({ created_at: -1 }) // Sort by creation date in descending order
-            .skip(filters.limit * (filters.page - 1)) // Calculate the number of documents to skip for pagination
-            .limit(filters.limit)
-            .toArray();
         const totalPostsCount = await PostCollection.countDocuments(query);
         const postsWithUserData = await Promise.all(posts.map(async (post) => {
             const user = await UserCollection.findOne({ _id: post.user_id }, { projection: { name: 1, image: 1 } });

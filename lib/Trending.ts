@@ -43,7 +43,7 @@ class Trending {
             console.error(`Something went wrong in updateTag: ${error}`);
         }
     }
-    private async _updateScoreForTimeSpan(key: string, id: string, timeSpan: 'hourly' | 'daily' = 'daily'): Promise<Number> {
+    private async _updateScoreForTimeSpan(key: string, id: string, timeSpan: 'hourly' | 'daily' = 'daily'): Promise<number> {
         const currentScore = parseFloat(await this.client.zscore(key, id) || '1');
         console.log("I'm in update static", currentScore, id)
         const u = Math.max(currentScore, new Date().getTime() * this.rateDaily);
@@ -52,7 +52,23 @@ class Trending {
         console.log('newScore', newScore, id);
         return newScore;
     };
+    public async unlikePost(key: string, id: string): Promise<void> {
+        try {
+            const currentScore = parseFloat(await this.client.zscore(key, id) || '0');
+            if (currentScore === 0) {
+                console.log(`Post ${id} not found or already at minimum score.`);
+                return;
+            }
 
+            const calculatedScore = await this._updateScoreForTimeSpan(key, id);
+            const newScore = Math.max(0, 2 * currentScore - calculatedScore);;
+
+            await this.client.zadd(key, newScore.toString(), id);
+            console.log(`Updated score for post ${id} after unlike: ${newScore}`);
+        } catch (error) {
+            console.error(`Error in unlikePost: ${error}`);
+        }
+    }
     public async getTrendingItemsWithoutScores(timeSpan: 'tags' | 'daily' = 'daily', n: number = 10): Promise<Array<string>> {
         const key = timeSpan === 'tags' ? 'tags' : 'trending_daily';
         // Fetch the top n items in descending order by score but only return the members, not the scores

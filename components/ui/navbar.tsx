@@ -41,7 +41,7 @@ export default function NavBar() {
 
         const temp = () => {
             if (pathname.startsWith("/genre")) return 1;
-            else if (pathname === "/reading-list") return 2;
+            else if (pathname === "/explore") return 2;
             else if (pathname === "/") return 0;
             else return 4;
         }
@@ -131,6 +131,16 @@ export default function NavBar() {
                 <NavbarMenuItem >
                     <Link className="w-full" href="/explore" size="lg">
                         Explore
+                    </Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="/reading-list" size="lg">
+                        My List
+                    </Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="/profile" size="lg">
+                        Profile
                     </Link>
                 </NavbarMenuItem>
             </NavbarMenu>
