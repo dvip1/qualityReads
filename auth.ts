@@ -10,6 +10,7 @@ export const authOptions: NextAuthConfig = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
+  trustHost: true,
   events: {
     signIn: async ({ user, account, profile, isNewUser }) => {
       console.log(`User signed in ${user.email}`)

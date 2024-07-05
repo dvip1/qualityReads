@@ -55,7 +55,7 @@ export default function Page() {
                                 <div className="p-6 ">
                                     <div className="bg-gray-100/80 dark:bg-[#393646] rounded-2xl shadow-lg p-4 w-fit">
                                         <h2 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">
-                                            Today's Trending Hashtags
+                                            Today&apos;s Trending Hashtags
                                         </h2>
                                         <div className="bg-white/70 dark:bg-[#4F4557] rounded-xl p-3 ">
                                             <div className="flex flex-wrap gap-2 ">

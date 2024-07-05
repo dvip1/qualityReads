@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         const PostCollection = db.collection("posts");
         const UserData = await UserCollection.findOne({ email: session?.user?.email }) as UserTypes;
         if (!UserData) {
-            return null; // Early return if user data is not found
+            return Response.json({ "message": "No user found" }, { status: 401 });
         }
         const query: Query = {};
 
