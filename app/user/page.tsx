@@ -6,7 +6,7 @@ import axios from 'axios';
 import { PostData } from '../genre/[slug]/page';
 import ProtectedRoute from '@/utils/protectedRoute';
 import NavBar from '@/components/ui/navbar';
-import { ProfileHeader } from '../profile/page';
+import Image from 'next/image';
 import Loading from '../loading';
 import SkeletonCustom from '@/components/ui/skeleton-custom';
 import { SmallCards } from '@/components/ui/main-cards';
@@ -35,7 +35,6 @@ export default function Page() {
                         'Content-Type': 'application/json'
                     }
                 });
-                console.log(`This is somethin here: ${JSON.stringify(response.data)}`)
                 setMainData(response.data.posts);
                 setUserName(response.data.name);
                 setUserImage(response.data.image);
@@ -57,7 +56,17 @@ export default function Page() {
                 <div className="min-h-screen flex flex-col items-center font-sans pb-4 ">
                     <NavBar />
                     <div>
-                        <ProfileHeader url={userImage} />
+                        <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
+
+                            <Image
+                                src={userImage}
+                                width={96}
+                                height={96}
+                                alt={"CN"}
+                                className="rounded-full"
+                            />
+
+                        </div>
                     </div>
                     <h1 className="scroll-m-20 text-3xl font-bold tracking-tight lg:text-4xl text-blue-800/70 dark:text-blue-300/80 ">
                         {userName}

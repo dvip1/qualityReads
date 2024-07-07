@@ -95,7 +95,7 @@ const Profile = () => {
         </ProtectedRoute>
     );
 };
-export const ProfileHeader: React.FC<ProfileHeaderType> = (props) => {
+const ProfileHeader: React.FC<ProfileHeaderType> = (props) => {
     return (
         <>
             <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
