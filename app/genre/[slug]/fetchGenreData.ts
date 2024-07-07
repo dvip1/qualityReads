@@ -46,6 +46,7 @@ const fetchGenreData = async (props: fetchGenreTypes) => {
                 content: post.content,
                 postId: post._id,
                 isPostInList
+                
             };
         }));
         console.log(`Sending User data: ${JSON.stringify(postsWithUserData)}`)

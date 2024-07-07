@@ -52,7 +52,8 @@ export default async function FetchReadingList(props: ReadingTypes) {
                 userDisliked,
                 content: post.content,
                 postId: post._id,
-                isPostInList
+                isPostInList,
+                userId: post.user_id
             };
         }));
         // Return the posts and the total number of posts

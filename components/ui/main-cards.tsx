@@ -10,6 +10,7 @@ import { HiMinusCircle } from "react-icons/hi";
 import AddRemoveFromList, { MyListTypes } from "@/utils/addToList";
 import { toast } from "react-toastify";
 import { useTheme } from "next-themes";
+import { useRouter } from 'next/navigation'
 export interface SmallCardsType {
     _id?: ObjectId
     url: string
@@ -23,6 +24,8 @@ export interface SmallCardsType {
     userLiked: boolean
     userDisliked: boolean
     isPostInList: boolean
+    userId?: string
+
 }
 function removeHashtags(text: string) {
     return text.replace(/#[^\s#]+/g, '').trim();
@@ -37,6 +40,7 @@ function getDomainFromUrl(url: string) {
     }
 }
 export const SmallCards: React.FC<SmallCardsType> = (props) => {
+    const router = useRouter()
     const [liked, setLiked] = useState(props.userLiked);
     const [disliked, setDisliked] = useState(props.userDisliked);
     const [likes, setLikes] = useState(props.likes);
@@ -111,6 +115,9 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
             }
         }
     };
+    const handleProfileClick = () =>{
+        router.push(`/user?id=${props?.userId}`)
+    }
     const handleAddToList = () => {
 
         if (addList) {
@@ -146,15 +153,22 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <>
             <Card className="max-w-[350px]  my-2 " isBlurred >
                 <CardHeader className=" flex gap-3 ">
+
                     <Image
                         alt={props.name[0] || "D"}
                         height={40}
                         radius="sm"
                         src={props.image}
                         width={40}
+                        onClick={handleProfileClick}
+                        className="cursor-pointer"
                     />
                     <div className="flex flex-col">
-                        <p className="text-md">{props.name}</p>
+                        <Link
+                            className="text-md"
+                            href={`/user?id=${props?.userId}`}
+                            color={"foreground"}
+                        >{props.name}</Link>
 
                     </div>
                 </CardHeader>

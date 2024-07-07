@@ -89,6 +89,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                         userLiked={data.userLiked}
                                         userDisliked={data.userDisliked}
                                         isPostInList={data.isPostInList}
+                                        userId={data.userId}
                                     />
                                 )) : <p>Nothing to see here</p>}
                             </div>

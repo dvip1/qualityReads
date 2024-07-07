@@ -44,7 +44,8 @@ const fetchHomeData = async (props: fetchHomeTypes) => {
                 userDisliked,
                 content: post.content,
                 postId: post._id,
-                isPostInList
+                isPostInList,
+                userId: post.user_id
             };
         }));
 

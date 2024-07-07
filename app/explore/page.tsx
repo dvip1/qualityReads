@@ -91,6 +91,7 @@ export default function Page() {
                                             userLiked={data.userLiked}
                                             userDisliked={data.userDisliked}
                                             isPostInList={data.isPostInList}
+                                            userId={data.userId}
                                         />
                                     ))}
                                 </div>

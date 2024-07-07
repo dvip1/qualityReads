@@ -1,5 +1,4 @@
 import clientPromise from '@/lib/db'
-import fetchUserData from '@/utils/fetchUserData';
 import { ObjectId } from 'mongodb';
 import { auth } from '@/auth';
 import { UserTypes } from '@/app/profile/page';
@@ -77,7 +76,8 @@ export async function POST(req: Request) {
                 userDisliked: post.disliked_by.some((id: ObjectId) => id.equals(UserData._id)),
                 content: post.content,
                 postId: post._id,
-                isPostInList: UserData?.myList?.some(id => id.equals(post._id)) ?? false
+                isPostInList: UserData?.myList?.some(id => id.equals(post._id)) ?? false,
+                userId: post.user_id
             };
         }));
         return Response.json({ posts: postsWithUserData, total: totalPostsCount }, { status: 201 });

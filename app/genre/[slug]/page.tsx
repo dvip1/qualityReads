@@ -12,6 +12,7 @@ import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { ObjectId } from "mongodb";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
+import axios from "axios";
 interface UserTypes {
     name: string;
     image: string;
@@ -29,6 +30,7 @@ export interface PostData {
     userLiked: boolean;
     userDisliked: boolean;
     isPostInList: boolean
+    userId: string
 }
 export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,9 +51,13 @@ export default function Page({ params }: { params: { slug: string } }) {
                     page: currentPage,
                     limit: 15,
                 };
-                const result = await fetchGenreData(data);
-                setMainData(result.posts);
-                setTotalPages(Math.ceil(result.total / data.limit));
+                const result = await axios.post("/api/fetch-posts", data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setMainData(result.data.posts);
+                setTotalPages(Math.ceil(result.data.total / data.limit));
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -90,6 +96,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     userLiked={data.userLiked}
                                     userDisliked={data.userDisliked}
                                     isPostInList={data.isPostInList}
+                                    userId={data.userId}
                                 />
                             ))}
                         </div>
