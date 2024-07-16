@@ -1,3 +1,4 @@
+/* Fetches posts in general, fetches filtered posts */
 import clientPromise from '@/lib/db'
 import { ObjectId } from 'mongodb';
 import { auth } from '@/auth';
@@ -32,9 +33,11 @@ export async function POST(req: Request) {
         const UserCollection = db.collection("users");
         const PostCollection = db.collection("posts");
         const UserData = await UserCollection.findOne({ email: session?.user?.email }) as UserTypes;
+
         if (!UserData) {
             return Response.json({ "message": "No user found" }, { status: 401 });
         }
+
         const query: Query = {};
 
         if (filters.category) query.category = filters.category;
@@ -44,41 +47,69 @@ export async function POST(req: Request) {
         if (filters.dislikedByUser) query.disliked_by = new ObjectId(UserData._id);
         if (filters.postIdInArray && filters.postIdInArray.length > 0) {
             query._id = { $in: filters.postIdInArray.map(id => new ObjectId(id)) };
-        };
+        }
 
-        let posts;
+        const pipeline: any[] = [
+            { $match: query },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "user_info"
+                }
+            },
+            { $unwind: "$user_info" },
+            {
+                $project: {
+                    url: 1,
+                    title: 1,
+                    tags: 1,
+                    likes: 1,
+                    dislikes: 1,
+                    content: 1,
+                    postId: "$_id",
+                    user: { name: "$user_info.name", image: "$user_info.image" },
+                    userLiked: { $in: [UserData._id, "$liked_by"] },
+                    userDisliked: { $in: [UserData._id, "$disliked_by"] },
+                    isPostInList: { $in: ["$_id", UserData.myList] },
+                    userId: "$user_id"
+                }
+            }
+        ];
+
         if (filters.postIdInArray && filters.postIdInArray.length > 0) {
-            // Fetch posts without sorting by created_at
-            posts = await PostCollection.find(query).toArray();
-            // Reorder posts to match the order in postIdInArray
-            const idOrder = filters.postIdInArray.map(id => id.toString());
-            posts.sort((a, b) => idOrder.indexOf(a._id.toString()) - idOrder.indexOf(b._id.toString()));
+            // No sorting for specific post IDs, reorder later
+            pipeline.push({ $sort: { _id: 1 } }); // Temporary sort to maintain order for subsequent processing
         } else {
             // Apply sorting by created_at if postIdInArray is not provided
-            posts = await PostCollection.find(query)
-                .sort({ created_at: -1 }) // Sort by creation date in descending order
-                .skip(filters.limit * (filters.page - 1)) // Calculate the number of documents to skip for pagination
-                .limit(filters.limit)
-                .toArray();
+            pipeline.push({ $sort: { created_at: -1 } });
+            pipeline.push({ $skip: filters.limit * (filters.page - 1) });
+            pipeline.push({ $limit: filters.limit });
+        }
+
+        const posts = await PostCollection.aggregate(pipeline).toArray();
+
+        if (filters.postIdInArray && filters.postIdInArray.length > 0) {
+            const idOrder = filters.postIdInArray.map(id => id.toString());
+            posts.sort((a, b) => idOrder.indexOf(a.postId.toString()) - idOrder.indexOf(b.postId.toString()));
         }
 
         const totalPostsCount = await PostCollection.countDocuments(query);
-        const postsWithUserData = await Promise.all(posts.map(async (post) => {
-            const user = await UserCollection.findOne({ _id: post.user_id }, { projection: { name: 1, image: 1 } });
-            return {
-                user: user ? { name: user.name, image: user.image } : { name: '', image: '' },
-                url: post.url,
-                title: post.title,
-                tags: post.tags,
-                likes: post.likes,
-                dislikes: post.dislikes,
-                userLiked: post.liked_by.some((id: ObjectId) => id.equals(UserData._id)),
-                userDisliked: post.disliked_by.some((id: ObjectId) => id.equals(UserData._id)),
-                content: post.content,
-                postId: post._id,
-                isPostInList: UserData?.myList?.some(id => id.equals(post._id)) ?? false,
-                userId: post.user_id
-            };
+
+        const postsWithUserData = posts.map((post) => ({
+            user: post.user,
+            url: post.url,
+            title: post.title,
+            tags: post.tags,
+            likes: post.likes,
+            dislikes: post.dislikes,
+            userLiked: post.userLiked,
+            userDisliked: post.userDisliked,
+            content: post.content,
+            postId: post.postId,
+            isPostInList: post.isPostInList,
+            userId: post.userId
         }));
         return Response.json({ posts: postsWithUserData, total: totalPostsCount }, { status: 201 });
     } catch (err) {
