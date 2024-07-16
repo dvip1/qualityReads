@@ -101,7 +101,7 @@ const ProfileHeader: React.FC<ProfileHeaderType> = (props) => {
             <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
 
                 <Image
-                    src={props.url}
+                    src={props.url || "./user.png"}
                     width={96}
                     height={96}
                     alt={"CN"}

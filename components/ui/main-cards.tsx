@@ -11,6 +11,7 @@ import AddRemoveFromList, { MyListTypes } from "@/utils/addToList";
 import { toast } from "react-toastify";
 import { useTheme } from "next-themes";
 import { useRouter } from 'next/navigation'
+
 export interface SmallCardsType {
     _id?: ObjectId
     url: string
@@ -158,7 +159,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                         alt={props.name[0] || "D"}
                         height={40}
                         radius="sm"
-                        src={props.image}
+                        src={ props.image ||"./user.png"}
                         width={40}
                         onClick={handleProfileClick}
                         className="cursor-pointer"
