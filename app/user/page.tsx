@@ -59,7 +59,7 @@ export default function Page() {
                         <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
 
                             <Image
-                                src={userImage || "./user.png"}
+                                src={userImage || "/user.png"}
                                 width={96}
                                 height={96}
                                 alt={"CN"}

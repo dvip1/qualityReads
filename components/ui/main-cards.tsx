@@ -159,7 +159,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                         alt={props.name[0] || "D"}
                         height={40}
                         radius="sm"
-                        src={ props.image ||"./user.png"}
+                        src={ props.image ||"/user.png"}
                         width={40}
                         onClick={handleProfileClick}
                         className="cursor-pointer"
