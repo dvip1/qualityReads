@@ -1,3 +1,4 @@
+/* Fetches post by specific user only */
 import clientPromise from '@/lib/db'
 import { UserTypes } from '@/app/profile/page';
 import { auth } from '@/auth';
