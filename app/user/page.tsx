@@ -12,6 +12,8 @@ import SkeletonCustom from '@/components/ui/skeleton-custom';
 import { SmallCards } from '@/components/ui/main-cards';
 import { Pagination } from '@nextui-org/pagination';
 import { Button } from '@nextui-org/button';
+import { Bounce, ToastContainer } from "react-toastify";
+
 export default function Page() {
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -54,6 +56,19 @@ export default function Page() {
         return (
             <ProtectedRoute>
                 <div className="min-h-screen flex flex-col items-center font-sans pb-4 ">
+                    <ToastContainer
+                        position="bottom-center"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        transition={Bounce}
+                        theme="light"
+                    />
                     <NavBar />
                     <div>
                         <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
