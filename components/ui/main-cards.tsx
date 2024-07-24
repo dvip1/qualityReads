@@ -75,7 +75,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     {
       key: "Share",
       label: "Share",
-      onClick: () => handleShare({ url: `${window.location.protocol}${window.location.host}/posts?id=${props._id}`, title: props.title, text: props.content }),
+      onClick: () => handleShare({ url: `/posts?id=${props._id}` }),
       startContent: <FaShareAlt className={iconClasses} />
     },
     {
@@ -86,7 +86,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <BsPatchPlusFill className={iconClasses} />
     }
   ];
-  const handleShare = async (shareData: { url: string, title: string, text: string }) => {
+  const handleShare = async (shareData: { url: string}) => {
     if (isWebShareSupported) {
       try {
         await navigator.share(shareData);
@@ -99,7 +99,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       // You can implement a custom share menu here
       console.log('Web Share not supported');
       // For now, let's just copy the URL to clipboard
-      navigator.clipboard.writeText(shareData.url);
+      navigator.clipboard.writeText(`${window.location.protocol}://${window.location.host}/${shareData.url}`);
       toast(" 📋 Copied to Clipboard!", {
         position: "top-right",
         autoClose: 3000,
