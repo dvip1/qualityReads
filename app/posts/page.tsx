@@ -70,9 +70,8 @@ export default function Page() {
                             <span> <SkeletonCustom /></span>
                         ) : (
                             <>
-                                <h1 className="mt-6 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
-                                    Shared Post
-                                </h1>
+                            <div className="h-4 w-full "></div>
+    
                                 {mainData && mainData.length > 0 && (
                                     <div className="mt-10">
                                         <SmallCards
@@ -96,7 +95,7 @@ export default function Page() {
                                 {mainData && mainData.length > 1 && (
                                     <div className="mt-10">
                                         <h2 className="flex items-center mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
-                                            Similar Posts
+                                            You might also like..
                                         </h2>
                                         <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
                                             {mainData.slice(1).map((data, index) => (
