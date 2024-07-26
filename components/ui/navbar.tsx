@@ -23,9 +23,7 @@ export default function NavBar() {
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isActive, setIsActive] = useState(0);
-    const handleThemeSwitch = () => {
-        (theme == "dark") ? setTheme("light") : setTheme("dark");
-    }
+ 
     const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
