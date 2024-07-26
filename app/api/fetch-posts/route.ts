@@ -136,7 +136,6 @@ export async function POST(req: Request) {
     }
 
     const posts = await PostCollection.aggregate(pipeline).toArray();
-    console.log(posts);
     if (filters.postIdInArray && filters.postIdInArray.length > 0) {
       const idOrder = filters.postIdInArray.map((id) => id.toString());
       posts.sort(
