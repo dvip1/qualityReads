@@ -27,7 +27,6 @@ interface Query {
 export async function POST(req: Request) {
   try {
     const filters: PostList = await req.json();
-    console.log(`This are the filters: ${JSON.stringify(filters)}`);
     const client = await clientPromise;
     const session = await auth();
     const db = client.db();
@@ -40,7 +39,6 @@ export async function POST(req: Request) {
     if (!UserData) {
       return Response.json({ message: "No user found" }, { status: 401 });
     }
-    console.log(UserData);
     const query: Query = {};
 
     if (filters.category) query.category = filters.category;
@@ -147,7 +145,6 @@ export async function POST(req: Request) {
           idOrder.indexOf(b.postId.toString()),
       );
     }
-    console.log(`This are the posts ${JSON.stringify(posts)}`);
     const totalPostsCount = await PostCollection.countDocuments(query);
 
     const postsWithUserData = posts.map((post) => ({
