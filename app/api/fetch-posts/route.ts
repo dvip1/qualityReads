@@ -27,6 +27,7 @@ interface Query {
 export async function POST(req: Request) {
   try {
     const filters: PostList = await req.json();
+    console.log(`This are the filters: ${JSON.stringify(filters)}`);
     const client = await clientPromise;
     const session = await auth();
     const db = client.db();
@@ -39,15 +40,16 @@ export async function POST(req: Request) {
     if (!UserData) {
       return Response.json({ message: "No user found" }, { status: 401 });
     }
-
+    console.log(UserData);
     const query: Query = {};
 
     if (filters.category) query.category = filters.category;
-    if (filters.tags) query.tags = { $in: filters.tags };
-    if (filters.usersPost) query.user_id = new ObjectId(UserData._id);
+    if (filters.tags && Array.isArray(filters.tags)) {
+      query.tags = { $in: filters.tags };
+    } if (filters.usersPost) query.user_id = new ObjectId(UserData._id);
     if (filters.likedByUser) query.liked_by = new ObjectId(UserData._id);
     if (filters.dislikedByUser) query.disliked_by = new ObjectId(UserData._id);
-    if (filters.postIdInArray && filters.postIdInArray.length > 0) {
+    if (filters.postIdInArray && Array.isArray(filters.postIdInArray) && filters.postIdInArray.length > 0) {
       query._id = { $in: filters.postIdInArray.map((id) => new ObjectId(id)) };
     }
 
@@ -101,6 +103,7 @@ export async function POST(req: Request) {
 
     // Add the rest of your pipeline stages
     pipeline = pipeline.concat([
+
       {
         $lookup: {
           from: "users",
@@ -120,13 +123,13 @@ export async function POST(req: Request) {
           content: 1,
           postId: "$_id",
           user: { name: "$user_info.name", image: "$user_info.image" },
-          userLiked: { $in: [UserData._id, "$liked_by"] },
-          userDisliked: { $in: [UserData._id, "$disliked_by"] },
-          isPostInList: { $in: ["$_id", UserData.myList] },
+          userLiked: { $in: [UserData._id, { $ifNull: ["$liked_by", []] }] },
+          userDisliked: { $in: [UserData._id, { $ifNull: ["$disliked_by", []] }] },
+          isPostInList: { $in: ["$_id", { $ifNull: [UserData.myList, []] }] },
           userId: "$user_id",
-        },
+        },      
       },
-    ]);
+    ]); 
 
     if (filters.postIdInArray && filters.postIdInArray.length > 0) {
       pipeline.push({ $sort: { _id: 1 } });
@@ -136,7 +139,6 @@ export async function POST(req: Request) {
     }
 
     const posts = await PostCollection.aggregate(pipeline).toArray();
-    console.log(posts);
     if (filters.postIdInArray && filters.postIdInArray.length > 0) {
       const idOrder = filters.postIdInArray.map((id) => id.toString());
       posts.sort(
@@ -145,7 +147,7 @@ export async function POST(req: Request) {
           idOrder.indexOf(b.postId.toString()),
       );
     }
-
+    console.log(`This are the posts ${JSON.stringify(posts)}`);
     const totalPostsCount = await PostCollection.countDocuments(query);
 
     const postsWithUserData = posts.map((post) => ({
