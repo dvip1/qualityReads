@@ -64,7 +64,6 @@ export async function POST(req: Request) {
         );
       }
 
-      const searchText = `${givenPost.title} ${givenPost.content} ${givenPost.tags.join(" ")}`;
 
       pipeline = [
         {
