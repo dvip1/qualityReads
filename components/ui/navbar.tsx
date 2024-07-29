@@ -13,17 +13,18 @@ import { IoSettings } from "react-icons/io5";
 import { MdLightMode, MdNightlight } from "react-icons/md";
 import { useTheme } from "next-themes";
 import { FaBook } from "react-icons/fa";
+import { Badge } from "@nextui-org/badge";
+import fetchUserData from "@/utils/fetchUserData";
+import { getNotificationCount } from "../notification/service";
 
 export default function NavBar() {
-    const { theme, setTheme } = useTheme();
     const iconClass = "text-xl text-default-500 pointer-events-none flex-shrink-0"
-    const themeIcon = (theme == "dark") ? <MdLightMode className={iconClass} /> : <MdNightlight className={iconClass} />;
     const router = useRouter();
     const pathname = usePathname();
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isActive, setIsActive] = useState(0);
- 
+    const [count, setCount] = useState(0);
     const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
@@ -43,9 +44,16 @@ export default function NavBar() {
             else if (pathname === "/") return 0;
             else return 4;
         }
-
         setIsActive(temp());
     }, [pathname]);
+    useEffect(() => {
+        const handleData = async () => {
+            const userData = await fetchUserData();
+            const req = await getNotificationCount(userData._id.toString());
+            setCount(req.data || 0);
+        };
+        handleData();
+    })
     return (
         <Navbar onMenuOpenChange={setIsMenuOpen}>
             <NavbarContent className="sm:hidden" justify="start">
@@ -77,15 +85,19 @@ export default function NavBar() {
             <NavbarContent as="div" justify="end">
                 <Dropdown placement="bottom-end">
                     <DropdownTrigger>
-                        <Avatar
-                            isBordered
-                            as="button"
-                            className="transition-transform"
-                            color="secondary"
-                            name="Jason Hughes"
-                            size="sm"
-                            src={session?.user?.image || DefaultUserProfile.src}
-                        />
+                        <div>
+                            <Badge content={count} color="secondary" className="transition-transform">
+                                <Avatar
+                                    isBordered
+                                    as="button"
+                                    className="transition-transform"
+                                    color="secondary"
+                                    name="Jason Hughes"
+                                    size="sm"
+                                    src={session?.user?.image || DefaultUserProfile.src}
+                                />
+                            </Badge>
+                        </div>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Profile Actions" variant="flat" className="">
                         <DropdownItem key="profile" className="h-14 gap-2" onClick={handleProfileClick}>
