@@ -29,7 +29,7 @@ class Trending {
         } catch (error) {
             console.error(`Something occured while updating the scores ${error}`);
         }
-
+            
     };
     public async updateTag(tags: string[]): Promise<void> {
         try {

@@ -34,19 +34,25 @@ class RedisNotificationService {
     if (existingNotificationIndex !== -1) {
       // Update existing notification
       const existingNotification = notifications[existingNotificationIndex];
+      const updatedUserIds = new Set(existingNotification.metadata.userIds);
+
+      if (updatedUserIds.has(userId)) {
+        updatedUserIds.delete(userId);
+      } else {
+        updatedUserIds.add(userId);
+      }
+
       const updatedNotification = {
         ...existingNotification,
         ...notificationData,
         metadata: {
           ...existingNotification.metadata,
           ...notificationData.metadata,
-          userIds: Array.from(new Set([
-            ...existingNotification.metadata.userIds,
-            ...notificationData.metadata.userIds
-          ])).filter(id => notificationData.metadata.userIds.includes(id))
+          userIds: Array.from(updatedUserIds),
+          count: updatedUserIds.size
         }
       };
-      updatedNotification.metadata.count = updatedNotification.metadata.userIds.length;
+
       notifications[existingNotificationIndex] = updatedNotification;
     } else {
       // Add new notification
@@ -104,7 +110,7 @@ class RedisNotificationService {
     const keys = await this.redis.keys(pattern);
     const notifications: Notification[] = [];
 
-    for (const key of                   keys) {
+    for (const key of keys) {
       const notificationStr = await this.redis.get(key);
       if (notificationStr) {
         notifications.push(JSON.parse(notificationStr));
@@ -117,7 +123,7 @@ class RedisNotificationService {
   async clearAllNotifications(userId: string): Promise<void> {
     const pattern = `${userId}:notifications:*`;
     const keys = await this.redis.keys(pattern);
-      
+
     if (keys.length > 0) {
       await this.redis.del(...keys);
       await this.redis.set(`${userId}:notification_count`, '0');

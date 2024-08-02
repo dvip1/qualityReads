@@ -15,7 +15,7 @@ import { useTheme } from "next-themes";
 import { FaBook } from "react-icons/fa";
 import { Badge } from "@nextui-org/badge";
 import fetchUserData from "@/utils/fetchUserData";
-import { getNotificationCount } from "../notification/service";
+import { getNotificationCount } from "@/app/notification/service";
 
 export default function NavBar() {
     const iconClass = "text-xl text-default-500 pointer-events-none flex-shrink-0"

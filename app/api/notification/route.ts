@@ -52,7 +52,6 @@ export async function POST(req: Request) {
     try {
         const requestData = await req.json();
         const checkInformation = requestData.userId && requestData.postId && requestData.message && requestData.metaId && requestData.type;
-
         if (!checkInformation) {
             return Response.json({ "message": "insufficient Information" }, { status: 400 });
         }
@@ -70,7 +69,6 @@ export async function POST(req: Request) {
         const redisClient = await getRedisClient();
         const NotificationServiceObject = new RedisNotificationService(redisClient);
         await NotificationServiceObject.upsertNotification(requestData.userId, requestData.type, data);
-
         return Response.json({ "message": "successfully inserted notification" }, { status: 200 });
     } catch (error) {
         console.error("Error inserting notification:", error);
@@ -96,7 +94,7 @@ export async function DELETE(req: Request) {
             NotificationServiceObject.clearAllNotifications(userId);
             return Response.json({ "message": "Deleted Succesfully" }, { status: 200 });
         };
-        return Response.json({ "message": "Invalid Request                                  " }, { status: 400 });
+        return Response.json({ "message": "Invalid Request" }, { status: 400 });
     }
     catch (error) {
         console.error("Error in GET request:", error);
