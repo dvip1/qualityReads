@@ -24,48 +24,77 @@ class RedisNotificationService {
     return `${userId}:notifications:${type}`;
   }
 
+  private async getNotifications(key: string): Promise<Notification[]> {
+    console.log(`Fetching notifications for key: ${key}`);
+    const existingNotificationsStr = await this.redis.get(key);
+    console.log(`Existing notifications string: ${existingNotificationsStr}`);
+    return existingNotificationsStr ? JSON.parse(existingNotificationsStr) : [];
+  }
+
   async upsertNotification(userId: string, type: string, notificationData: Notification): Promise<void> {
     const key = this.getKey(userId, type);
-    const existingNotificationsStr = await this.redis.get(key);
-    let notifications: Notification[] = existingNotificationsStr ? JSON.parse(existingNotificationsStr) : [];
+    const notifications: Notification[] = await this.getNotifications(key);
 
     const existingNotificationIndex = notifications.findIndex(n => n.id === notificationData.id);
 
+    let shouldIncrementCount = false;
+
     if (existingNotificationIndex !== -1) {
-      // Update existing notification
-      const existingNotification = notifications[existingNotificationIndex];
-      const updatedUserIds = new Set(existingNotification.metadata.userIds);
-
-      if (updatedUserIds.has(userId)) {
-        updatedUserIds.delete(userId);
-      } else {
-        updatedUserIds.add(userId);
-      }
-
-      const updatedNotification = {
-        ...existingNotification,
-        ...notificationData,
-        metadata: {
-          ...existingNotification.metadata,
-          ...notificationData.metadata,
-          userIds: Array.from(updatedUserIds),
-          count: updatedUserIds.size
-        }
-      };
-
-      notifications[existingNotificationIndex] = updatedNotification;
+      shouldIncrementCount = await this.updateExistingNotification(notifications, existingNotificationIndex, userId, notificationData);
     } else {
-      // Add new notification
-      notifications.push({
-        ...notificationData,
-        metadata: {
-          ...notificationData.metadata,
-          count: notificationData.metadata.userIds.length
-        }
-      });
-      await this.incrementNotificationCount(userId);
+      await this.addNewNotification(notifications, notificationData);
+      shouldIncrementCount = true;
     }
 
+    await this.saveNotifications(key, notifications);
+
+    if (shouldIncrementCount) {
+      await this.incrementNotificationCount(userId);
+    }
+  }
+
+  private async updateExistingNotification(
+    notifications: Notification[],
+    index: number,
+    userId: string,
+    notificationData: Notification
+  ): Promise<boolean> {
+    const existingNotification = notifications[index];
+    const updatedUserIds = new Set(existingNotification.metadata.userIds);
+    const newUserId = notificationData.metadata.userIds[0]; // The user who triggered the notification
+
+    let userAdded = false;
+
+    if (updatedUserIds.has(newUserId)) {
+      updatedUserIds.delete(newUserId);
+    } else {
+      updatedUserIds.add(newUserId);
+      userAdded = true;
+    }
+
+    notifications[index] = {
+      ...existingNotification,
+      ...notificationData,
+      metadata: {
+        ...existingNotification.metadata,
+        ...notificationData.metadata,
+        userIds: Array.from(updatedUserIds),
+        count: updatedUserIds.size
+      }
+    };
+
+    return userAdded;
+  }
+  private async addNewNotification(notifications: Notification[], notificationData: Notification): Promise<void> {
+    notifications.push({
+      ...notificationData,
+      metadata: {
+        ...notificationData.metadata,
+        count: notificationData.metadata.userIds.length
+      }
+    });
+  }
+  private async saveNotifications(key: string, notifications: Notification[]): Promise<void> {
     await this.redis.set(key, JSON.stringify(notifications));
   }
 
