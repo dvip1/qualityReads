@@ -35,7 +35,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification }) => 
             setImages(data);
         }
         getData();
-    }, [])
+    }, [notification.metadata.userIds])
 
     return (
         <Card className="max-w-[400px]" isBlurred>

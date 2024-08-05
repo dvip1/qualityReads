@@ -86,7 +86,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <BsPatchPlusFill className={iconClasses} />
     }
   ];
-  const handleShare = async (shareData: { url: string}) => {
+  const handleShare = async (shareData: { url: string }) => {
     if (isWebShareSupported) {
       try {
         await navigator.share(shareData);
@@ -113,6 +113,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleDislike = async () => {
+    if (!propId) return;
     if (disliked) {
       const sendObject: DislikePostTypes = {
         dislike: false,
@@ -146,6 +147,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleLike = async () => {
+    if(!propId)return;
     if (liked) {
       const sendObject: LikePostTypes = {
         like: false,
