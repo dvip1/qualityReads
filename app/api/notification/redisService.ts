@@ -101,18 +101,27 @@ class RedisNotificationService {
     const key = this.getKey(userId, type);
     const notificationsStr = await this.redis.get(key);
     return notificationsStr ? JSON.parse(notificationsStr) : [];
-  }
+  };
 
   async deleteNotification(userId: string, type: string, notificationId: string): Promise<void> {
     const key = this.getKey(userId, type);
+    console.log(`Input Data:  ${notificationId}`);
+    const notificationCount = await this.getNotificationCount(userId);
     const notificationsStr = await this.redis.get(key);
     if (notificationsStr) {
+      console.log(`notificationsStr: ${notificationsStr}`);
       let notifications: Notification[] = JSON.parse(notificationsStr);
+      console.log(`notifications: ${JSON.stringify(notifications)}`);
       const initialLength = notifications.length;
-      notifications = notifications.filter(n => n.id !== notificationId);
+      notifications = notifications.filter(n => {
+        const match = n.id.trim() !== notificationId.trim();
+      });
+      console.log('filter notifications', JSON.stringify(notifications));
+
       if (notifications.length < initialLength) {
+        const updateLength = notifications.length > 0 ? notificationCount - notifications[0].metadata.count : 0;
         await this.redis.set(key, JSON.stringify(notifications));
-        await this.decrementNotificationCount(userId);
+        await this.redis.set(`${userId}:notification_count`, updateLength.toString());
       }
     }
   }

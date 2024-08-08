@@ -25,7 +25,6 @@ export async function GET(req: Request) {
                 return await handleGetAllQuery(notificationService, userId);
             case "getByType":
                 return await handleGetByTypeQuery(notificationService, userId, type);
-
             default:
                 return Response.json({ message: "Invalid query" }, { status: 400 });
         }

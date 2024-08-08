@@ -17,25 +17,24 @@ export interface Notification {
 
 export interface NotificationCardProps {
     notification: Notification;
+    onClear: () => void;
 }
 
-const NotificationCard: React.FC<NotificationCardProps> = ({ notification }) => {
+const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onClear }) => {
     const router = useRouter();
     const [images, setImages] = useState<string[]>([]);
-    const onClear = () => {
-        console.log("clear")
-    }
+
     const handleViewPost = () => {
         router.push(`/posts?id=${notification.id}`);
     };
+
     useEffect(() => {
         const getData = async () => {
             const data = await getGroupImages(notification.metadata.userIds);
-            console.log(data);
             setImages(data);
         }
         getData();
-    }, [notification.metadata.userIds])
+    }, [notification?.metadata?.userIds]);
 
     return (
         <Card className="max-w-[400px]" isBlurred>
@@ -47,12 +46,6 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification }) => 
                             <Avatar src={image || './user.png'} key={Math.random()} />
                         ))}
                     </AvatarGroup>
-                    {/* <p className="text-gray-700 text-base">
-                        {notification.metadata?.userIds?.join(', ') || 'No user IDs available'}
-                    </p> */}
-                    {/* <p className="text-gray-600 text-sm">
-                        {new Date(parseInt(notification.timestamp)).toLocaleString()}
-                    </p> */}
                 </div>
             </CardBody>
             <CardFooter>
@@ -65,7 +58,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification }) => 
                         View Post
                     </Button>
                     <Button
-                        onClick={() => onClear()}
+                        onClick={onClear}
                         color='primary'
                         className='ml-2'
                         variant='faded'

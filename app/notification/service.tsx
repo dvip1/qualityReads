@@ -21,7 +21,7 @@ async function ClearAllNotification(userId: string) {
         console.error(`Got an error: ${error}`);
         return 0;
     }
-}
+};
 async function ClearByPostId(userId: string, postId: string, type: string) {
     try {
         axios.delete(`/api/notification?userId=${userId}&type=${type}&postId=${postId}`);

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { getAllNotification, getNotificationCount } from "./service"
+import { getAllNotification, getNotificationCount, ClearAllNotification, ClearByPostId } from "./service"
 import fetchUserData from "@/utils/fetchUserData";
 import ProtectedRoute from "@/utils/protectedRoute";
 import NavBar from "@/components/ui/navbar";
@@ -12,18 +12,36 @@ import NothingToSeeHere from "@/components/ui/nothingtosee";
 
 export default function Page() {
     const [notificationCount, setNotificationCount] = useState<number>(0);
-    const [notificationData, setNotificationData] = useState<Notification[]>();
+    const [notificationData, setNotificationData] = useState<Notification[]>([]);
+    const [userId, setUserId] = useState<string>("");
     useEffect(() => {
         const fetchNotification = async () => {
             const userData = await fetchUserData();
             const count = await getNotificationCount(userData._id.toString());
+            setUserId(userData._id.toString());
             if (!count.data) return;
             setNotificationCount(count.data || 0);
             const data = await getAllNotification(userData._id.toString());
+            console.log(JSON.stringify(data.data));
             setNotificationData(data.data[0]);
         }
         fetchNotification();
     }, []);
+
+    const handleRemoveNotification = async (notificationId: string) => {
+        await ClearByPostId(userId, notificationId, "liked");
+        const curr =notificationData.filter(notification => notification.id === notificationId);
+        console.log(JSON.stringify(notificationData));
+        const reducedCount = notificationCount - curr[0].metadata.count;
+        setNotificationData(prevData => prevData.filter(notification => notification.id !== notificationId));
+        setNotificationCount(reducedCount);
+    };
+
+    const handleClearAllNotifications = async () => {
+        await ClearAllNotification(userId);
+        setNotificationData([]);
+        setNotificationCount(0);
+    };
 
     return (
         <ProtectedRoute>
@@ -52,13 +70,9 @@ export default function Page() {
                             (notificationCount) ?
                                 <Card
                                     className="min-h-24"
-                                    onClick={() => {
-                                        // Handle the click event here
-                                        console.log('Card clicked');
-                                    }}
+                                    onClick={handleClearAllNotifications}
                                     isBlurred
                                     isPressable
-
                                 >
                                     <CardBody className="flex flex-col justify-center items-center">
                                         <div className="m-auto">
@@ -67,10 +81,11 @@ export default function Page() {
                                     </CardBody>
                                 </Card> : <NothingToSeeHere />
                         }
-                        {notificationCount && notificationData && (notificationData?.length > 0) && notificationData?.map(notification => (
+                        {(notificationCount != 0) && notificationData && (notificationData.length > 0) && notificationData.map(notification => (
                             <NotificationCard
-                                key={notification?.id}
+                                key={notification.id}
                                 notification={notification}
+                                onClear={() => handleRemoveNotification(notification.id)}
                             />
                         ))}
                     </div>
@@ -80,6 +95,5 @@ export default function Page() {
         </ProtectedRoute>
     )
 }
-
 
 
