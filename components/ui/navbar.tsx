@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image"
 import { useSession } from "next-auth/react"
 import DefaultUserProfile from "@/public/user.png"
 import { useEffect, useState } from "react";
@@ -10,12 +9,11 @@ import { FaLeaf } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import { FaSignOutAlt } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
-import { MdLightMode, MdNightlight } from "react-icons/md";
-import { useTheme } from "next-themes";
 import { FaBook } from "react-icons/fa";
 import { Badge } from "@nextui-org/badge";
 import fetchUserData from "@/utils/fetchUserData";
 import { getNotificationCount } from "@/app/notification/service";
+import { IoNotifications } from "react-icons/io5";
 
 export default function NavBar() {
     const iconClass = "text-xl text-default-500 pointer-events-none flex-shrink-0"
@@ -35,6 +33,9 @@ export default function NavBar() {
     const handleListClick = () => {
         router.push("/reading-list")
     }
+    const handleBellClick = () => {
+        router.push("/notification")
+    };
     useEffect(() => {
         console.log(`Current Path name: ${pathname}`);
 
@@ -53,7 +54,8 @@ export default function NavBar() {
             setCount(req.data || 0);
         };
         handleData();
-    })
+    }, []);
+
     return (
         <Navbar onMenuOpenChange={setIsMenuOpen}>
             <NavbarContent className="sm:hidden" justify="start">
@@ -116,7 +118,12 @@ export default function NavBar() {
                         >
                             Settings
                         </DropdownItem>
-
+                        <DropdownItem key="notification"
+                            onClick={handleBellClick}
+                            startContent={<IoNotifications className={iconClass} />}
+                        >
+                            Notification
+                        </DropdownItem>
                         <DropdownItem key="logout"
                             color="danger"
                             onClick={handleSignOut}

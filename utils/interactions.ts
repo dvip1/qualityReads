@@ -5,7 +5,6 @@ import fetchUserData from "./fetchUserData";
 import Trending from "@/lib/Trending";
 import { getRedisClient } from "@/lib/redis";
 import { PostNotificationData } from "@/app/notification/service";
-import { user } from "@nextui-org/theme";
 export interface LikePostTypes {
     like: boolean
     postId: ObjectId
@@ -38,6 +37,7 @@ const LikePost = async (props: LikePostTypes) => {
 const updateTrendingScore = async (TrendingObject: Trending, props: LikePostTypes) => {
     if (props.like) {
         await TrendingObject.updatePostScore("trending_daily", props.postId.toString());
+
     } else {
         await TrendingObject.unlikePost("trending_daily", props.postId.toString());
     }

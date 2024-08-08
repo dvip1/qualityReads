@@ -25,9 +25,7 @@ class RedisNotificationService {
   }
 
   private async getNotifications(key: string): Promise<Notification[]> {
-    console.log(`Fetching notifications for key: ${key}`);
     const existingNotificationsStr = await this.redis.get(key);
-    console.log(`Existing notifications string: ${existingNotificationsStr}`);
     return existingNotificationsStr ? JSON.parse(existingNotificationsStr) : [];
   }
 
@@ -67,6 +65,7 @@ class RedisNotificationService {
 
     if (updatedUserIds.has(newUserId)) {
       updatedUserIds.delete(newUserId);
+      this.decrementNotificationCount(userId);
     } else {
       updatedUserIds.add(newUserId);
       userAdded = true;

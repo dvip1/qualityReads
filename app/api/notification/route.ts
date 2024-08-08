@@ -3,9 +3,8 @@ import { getRedisClient } from "@/lib/redis";
 import {
     handleCountQuery,
     handleGetAllQuery,
-    handleGetByTypeQuery
+    handleGetByTypeQuery,
 } from "./utils";
-
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
@@ -26,6 +25,7 @@ export async function GET(req: Request) {
                 return await handleGetAllQuery(notificationService, userId);
             case "getByType":
                 return await handleGetByTypeQuery(notificationService, userId, type);
+
             default:
                 return Response.json({ message: "Invalid query" }, { status: 400 });
         }
