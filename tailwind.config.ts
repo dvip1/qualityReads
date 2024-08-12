@@ -7,7 +7,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/components/(autocomplete|avatar|button|card|dropdown|input|modal|navbar|pagination|progress|skeleton|toggle|popover|ripple|spinner|listbox|divider|scroll-shadow|menu).js"
+    "./node_modules/@nextui-org/theme/dist/components/(autocomplete|avatar|badge|button|card|dropdown|input|modal|navbar|pagination|progress|skeleton|toggle|popover|ripple|spinner|listbox|divider|scroll-shadow|menu).js"
   ],
   theme: {
     extend: {

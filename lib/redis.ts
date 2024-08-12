@@ -14,7 +14,7 @@ const redisOptions: RedisOptions = {
 };
 if (process.env.REDIS_PASSWORD) {
     redisOptions['password'] = process.env.REDIS_PASSWORD;
-}
+};
 
 const redisClient = new Redis(redisOptions);
 

@@ -86,7 +86,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <BsPatchPlusFill className={iconClasses} />
     }
   ];
-  const handleShare = async (shareData: { url: string}) => {
+  const handleShare = async (shareData: { url: string }) => {
     if (isWebShareSupported) {
       try {
         await navigator.share(shareData);
@@ -99,7 +99,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       // You can implement a custom share menu here
       console.log('Web Share not supported');
       // For now, let's just copy the URL to clipboard
-      navigator.clipboard.writeText(`${window.location.protocol}://${window.location.host}${shareData.url}`);
+      navigator.clipboard.writeText(`${window.location.protocol}//${window.location.host}${shareData.url}`);
       toast(" 📋 Copied to Clipboard!", {
         position: "top-right",
         autoClose: 3000,
@@ -113,6 +113,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleDislike = async () => {
+    if (!propId) return;
     if (disliked) {
       const sendObject: DislikePostTypes = {
         dislike: false,
@@ -146,6 +147,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleLike = async () => {
+    if(!propId)return;
     if (liked) {
       const sendObject: LikePostTypes = {
         like: false,

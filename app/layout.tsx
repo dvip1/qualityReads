@@ -57,8 +57,8 @@ export async function generateMetadata(): Promise<Metadata> {
       site: '@PatelDvip',
       creator: '@PatelDvip',
       images: [
+        `${protocol}://${domain}/twitter.png`,
         `${protocol}://${domain}/qualityreads.jpg`,
-        `${protocol}://${domain}/qualityreads.png`,
       ],
     },
     icons: {
