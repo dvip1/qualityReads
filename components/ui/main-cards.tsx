@@ -99,7 +99,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       // You can implement a custom share menu here
       console.log('Web Share not supported');
       // For now, let's just copy the URL to clipboard
-      navigator.clipboard.writeText(`${window.location.protocol}://${window.location.host}${shareData.url}`);
+      navigator.clipboard.writeText(`${window.location.protocol}//${window.location.host}${shareData.url}`);
       toast(" 📋 Copied to Clipboard!", {
         position: "top-right",
         autoClose: 3000,
