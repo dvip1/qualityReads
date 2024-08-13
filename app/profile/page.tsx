@@ -34,8 +34,8 @@ const Profile = () => {
     if (status === "loading") return <Loading />;
     const handleSignOut = async () => {
         await signOut();
-        console.log("Signed Out!")
-    }
+        console.log('Sign out');
+    };
 
     return (
         <ProtectedRoute>
@@ -86,8 +86,8 @@ const Profile = () => {
                     </div>
 
                     <div className="mt-8">
-                        <Button color="danger" variant="ghost">
-                            <FaSignOutAlt className={iconClass} onClick={handleSignOut} /> Log out
+                        <Button color="danger" variant="ghost" onClick={handleSignOut}>
+                            <FaSignOutAlt className={iconClass} /> Log out
                         </Button>
                     </div>
                 </div>

@@ -2,13 +2,11 @@
 import ProtectedRoute from "@/utils/protectedRoute"
 import { ToastContainer, Bounce } from "react-toastify"
 import { LuBadgeInfo } from "react-icons/lu";
-import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/react";
 import NavBar from "@/components/ui/navbar";
 export default function Page() {
     return (
         <ProtectedRoute>
-
             <div className="min-h-screen pb-10 ">
                 <NavBar />
                 <div className="max-w-4xl mx-auto flex flex-col items-center px-4">
