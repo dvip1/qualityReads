@@ -2,11 +2,13 @@
 import { signIn } from 'next-auth/react'
 import { Button, ButtonGroup } from "@nextui-org/button";
 import Image from 'next/image';
+
 export default function LandingPage() {
     const handleClick = async () => {
         console.log("Do something")
-        await signIn('google');
+        await signIn('google', { callbackUrl: '/about' });
     }
+
     return (
         <>
             <div className="h-screen flex justify-center items-center ">
@@ -35,4 +37,4 @@ export default function LandingPage() {
             </div>
         </>
     )
-} 
+}
