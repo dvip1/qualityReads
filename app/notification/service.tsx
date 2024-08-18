@@ -56,11 +56,37 @@ async function PostNotificationData(props: PostNotificationTypes) {
     }
 };
 
+async function PostNoificationAbly(userId: string) {
+    try {
+        const baseUrl = `${process.env.SERVER_PROTOCOL}://${process.env.SERVER_HOST}`;
+        const apiUrl = `${baseUrl}/api/Ably`;
+
+        console.log('Sending notification to:', apiUrl);
+
+        const response = await axios.post(apiUrl, { userId }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Notification response:', response.data);
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error:', error.response?.data);
+            throw new Error(`Error occurred while posting notification: ${error.response?.data?.message || error.message}`);
+        } else {
+            console.error('Unexpected error:', error);
+            throw new Error(`Unexpected error occurred while posting notification: ${error}`);
+        }
+    }
+};
 export {
     getNotificationCount,
     getAllNotification,
     getByTypeNotification,
     ClearAllNotification,
     PostNotificationData,
-    ClearByPostId
-}                                                       
+    ClearByPostId,
+    PostNoificationAbly
+}                                                           
