@@ -20,31 +20,25 @@ export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
     const [ably, setAbly] = useState<Ably.Realtime | null>(null);
 
     useEffect(() => {
-        console.log(`[${new Date().toISOString()}] Initializing Ably instance with userId:`, userId);
         const ablyInstance = new Ably.Realtime({ authUrl: '/api/Ably?userId=' + userId });
         ablyInstance.connection.once('connected', () => {
-            console.log(`[${new Date().toISOString()}] Ably connected`);
         });
         ablyInstance.connection.on('failed', (err) => {
             console.error(`[${new Date().toISOString()}] Ably connection failed:`, err);
         });
         setAbly(ablyInstance);
         return () => {
-            console.log(`[${new Date().toISOString()}] Closing Ably instance`);
             ablyInstance.close();
         };
     }, [userId]);
 
     useEffect(() => {
         if (!ably) {
-            console.log(`[${new Date().toISOString()}] Ably instance not available yet`);
             return;
         }
-        console.log(`[${new Date().toISOString()}] Subscribing to channel notifications: notifications:${userId}`);
         const channel = ably.channels.get(`notifications:${userId}`);
         let activeToasts: React.ReactText[] = []; // Array to store active toast IDs
         const handleNotification = (message: any) => {
-            console.log(`[${new Date().toISOString()}] Received notification:`, message);
             setUnreadCount((prevCount) => prevCount + 1);
             const toastId = toast(`🔔 You have a new notification!`, {
                 position: "top-right",
@@ -62,14 +56,12 @@ export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
         channel.subscribe('new-notification', handleNotification);
 
         return () => {
-            console.log(`[${new Date().toISOString()}] Unsubscribing from channel notifications: notifications:${userId}`);
             channel.unsubscribe('new-notification', handleNotification);
             activeToasts.forEach(id => toast.dismiss(id));
         };
     }, [ably, userId, theme]);
 
     const resetUnreadCount = () => {
-        console.log(`[${new Date().toISOString()}] Resetting unread count`);
         setUnreadCount(0);
     };
 

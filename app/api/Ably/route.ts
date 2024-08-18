@@ -10,10 +10,8 @@ export async function GET(req: NextRequest) {
     if (!API_KEY || !userId) {
         return NextResponse.json({ message: "Something wrong while getting token" }, { status: 400 });
     };
-
     const client = new Ably.Realtime(API_KEY);
     const tokenRequestData = await client.auth.createTokenRequest({ clientId: userId });
-    console.log(`We got the token ${tokenRequestData}`);
     return NextResponse.json(tokenRequestData, { status: 200 });
 };
 
@@ -30,26 +28,14 @@ function getAblyClient() {
 
 export async function POST(req: NextRequest) {
     try {
-        console.log(`[${new Date().toISOString()}] Received POST request`);
-
         const requestData = await req.json();
-        console.log(`[${new Date().toISOString()}] Parsed request data:`, requestData);
-
         const { userId } = requestData;
         if (!userId) {
-            console.log(`[${new Date().toISOString()}] UserId not provided`);
             return NextResponse.json({ message: 'UserId not provided' }, { status: 400 });
         }
-
         const client = getAblyClient();
-        console.log(`[${new Date().toISOString()}] Ably client initialized`);
-
         const channel = client.channels.get(`notifications:${userId}`);
-        console.log(`[${new Date().toISOString()}] Got channel: notifications:${userId}`);
-
         await channel.publish('new-notification', { message: "User Liked your post" });
-        console.log(`[${new Date().toISOString()}] Published notification to channel`);
-
         return NextResponse.json({ message: "success" }, { status: 200 });
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Error in Ably notification:`, error);
