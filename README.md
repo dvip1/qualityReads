@@ -1,37 +1,42 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# QualityReads
 
-## Getting Started
+QualityReads is a website where you can share & find your favorite content, whether it be a website, video, or audio.
 
-First, run the development server:
+[Live Link](https://quality-reads-tau.vercel.app/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Like a post**: View all liked and disliked posts in your profile. 👍
+- **Customize your profile**: Change themes and settings to personalize your experience. 🎨
+- **Add posts to a list**: Save posts for later viewing. 📋
+- **Share posts**: Easily share posts with friends. 📤
+- **Hashtags**: Click on hashtags to find related posts (feature coming soon). 🔗
+- **User profiles**: View all posts by clicking on a profile or username. 👤
+- **Trending**: Explore trending posts and hashtags. 📈
+- **Notifications**: Receive notifications when someone likes your posts. 🔔
+- **Profile menu**: Access settings, log out, notifications, and your list by clicking your profile at the top. ⚙️
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Frontend**: Next.js 14 app router
+- **Database**: MongoDB
+- **Cache/Queue**: Redis (for storing trending items and notifications)
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+To run this project, you will need to add the following environment variables to your `.env` file:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `AUTH_GOOGLE_ID`: Google OAuth Client ID
+- `AUTH_GOOGLE_SECRET`: Google OAuth Client Secret
+- `AUTH_SECRET`: Secret for NextAuth
+- `MONGODB_URI`: MongoDB connection string
+- `REDIS_URI`: Redis connection string
+- `SERVER_PROTOCOL`: `http` or `https`
+- `SERVER_HOST`: Server host address
+- `ABLY_API_KEY`: Ably API key for real-time notifications
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Contribution
 
-## Deploy on Vercel
+We welcome contributions! Please fork the repository and submit a pull request with your changes. For major changes, please open an issue first to discuss what you would like to change.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# qualityReads
+Thank you for contributing to QualityReads!
