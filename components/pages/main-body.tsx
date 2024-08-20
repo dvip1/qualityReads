@@ -4,11 +4,11 @@ import { PostData } from "@/app/genre/[slug]/page";
 import PostComponent from "@/components/posts/postComponent";
 import { BiSolidHomeCircle } from "react-icons/bi";
 import { useState, useEffect } from "react";
-import fetchHomeData from "@/utils/fetchHome";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
 import { Bounce, ToastContainer } from "react-toastify";
 import SkeletonCustom from "../ui/skeleton-custom";
+import axios from "axios";
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
@@ -22,9 +22,13 @@ export default function MainBody() {
                     page: currentPage,
                     limit: 15,
                 };
-                const result = await fetchHomeData(data);
-                setMainData(result.posts);
-                setTotalPages(Math.ceil(result.total / data.limit)); //  
+                const response = await axios.post("/api/fetch-posts", data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setMainData(response?.data?.posts);
+                setTotalPages(Math.ceil(response?.data?.total / data.limit)); //  
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {

@@ -147,7 +147,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleLike = async () => {
-    if(!propId)return;
+    if (!propId) return;
     if (liked) {
       const sendObject: LikePostTypes = {
         like: false,
@@ -184,10 +184,10 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
   const handleProfileClick = () => {
     router.push(`/user?id=${props?.userId}`);
   };
-  const handleAddToList = () => {
+  const handleAddToList = async () => {
     if (addList) {
       setAddList(false);
-      propId && AddRemoveFromList({ postId: propId });
+      propId && await AddRemoveFromList({ postId: propId });
       toast(" 📑 Removed from List!", {
         position: "top-right",
         autoClose: 3000,
@@ -200,7 +200,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       });
     } else {
       setAddList(true);
-      propId && AddRemoveFromList({ postId: propId });
+      propId && await AddRemoveFromList({ postId: propId });
       toast(" 📑 Added to List!", {
         position: "top-right",
         autoClose: 3000,
