@@ -33,7 +33,7 @@ import { useRouter } from "next/navigation";
 import { FaShareAlt } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, cn } from "@nextui-org/react";
-
+import ReadMoreModal from "../posts/readMoreModal";
 export interface SmallCardsType {
   _id?: ObjectId;
   url: string;
@@ -48,6 +48,7 @@ export interface SmallCardsType {
   userDisliked: boolean;
   isPostInList: boolean;
   userId?: string;
+  onReadMore: (title: string, content: string) => void
 }
 function removeHashtags(text: string) {
   return text.replace(/#[^\s#]+/g, "").trim();
@@ -67,10 +68,14 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
   const [likes, setLikes] = useState(props.likes);
   const [dislikes, setDislikes] = useState(props.dislikes);
   const [addList, setAddList] = useState(props.isPostInList);
+
   const propId = props._id;
   const { theme } = useTheme();
   const iconClasses = "text-xl text-default-500 pointer-events-none flex-shrink-0";
   const isWebShareSupported = navigator.share !== undefined;
+  const content = removeHashtags(props.content);
+  const shouldShowReadMore = content.length > 172;
+
   const optionItems = [
     {
       key: "Share",
@@ -147,7 +152,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
     }
   };
   const handleLike = async () => {
-    if(!propId)return;
+    if (!propId) return;
     if (liked) {
       const sendObject: LikePostTypes = {
         like: false,
@@ -184,10 +189,10 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
   const handleProfileClick = () => {
     router.push(`/user?id=${props?.userId}`);
   };
-  const handleAddToList = () => {
+  const handleAddToList = async () => {
     if (addList) {
       setAddList(false);
-      propId && AddRemoveFromList({ postId: propId });
+      propId && await AddRemoveFromList({ postId: propId });
       toast(" 📑 Removed from List!", {
         position: "top-right",
         autoClose: 3000,
@@ -200,7 +205,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       });
     } else {
       setAddList(true);
-      propId && AddRemoveFromList({ postId: propId });
+      propId && await AddRemoveFromList({ postId: propId });
       toast(" 📑 Added to List!", {
         position: "top-right",
         autoClose: 3000,
@@ -213,6 +218,11 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       });
     }
   };
+
+  const toggleReadMore = () => {
+    props.onReadMore(props.title, props.content);
+  };
+
   return (
     <>
       <Card className="max-w-[350px]  my-2 " isBlurred>
@@ -240,7 +250,12 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <CardBody className="flex flex-col gap-1">
           <p className="text-small ">{props.title}</p>
           <p className="text-small text-black/60 dark:text-white/60">
-            {removeHashtags(props.content)}
+            {content.slice(0, 172)}
+            {content.length > 172 && (
+              <span onClick={toggleReadMore} className="text-blue-500 hover:underline cursor-pointer">
+                {'..read more'}
+              </span>
+            )}
           </p>
 
           <Link href={props.url} showAnchorIcon target="_blank">
@@ -248,15 +263,18 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
           </Link>
           <div className="flex flex-wrap mt-auto">
             {props.tags &&
-              props.tags.map((item, index) => (
-                <p
-                  key={index}
-                  className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"
-                >
-                  {" "}
-                  {item}
-                </p>
-              ))}
+              props.tags.map((item, index) => {
+                const tagName = item.startsWith('#') ? item.slice(1) : item;
+                return (
+                  <Link key={index} href={`/explore/tags?query=${tagName}`}>
+                    <p
+                      className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"
+                    >
+                      {tagName}
+                    </p>
+                  </Link>
+                );
+              })}
           </div>
         </CardBody>
         <Divider />
@@ -314,18 +332,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 )}
               </DropdownMenu>
             </Dropdown>
-
-            {/* {addList ? (
-              <HiMinusCircle
-                onClick={handleAddToList}
-                className="text-2xl text-[#C8CFA0] hover:text-blue-500 dark:hover:text-blue-500"
-              />
-            ) : (
-              <BsPatchPlusFill
-                onClick={handleAddToList}
-                className="text-2xl text-[#78ABA8] hover:text-blue-500"
-              />
-            )} */}
           </span>
         </CardFooter>
       </Card>

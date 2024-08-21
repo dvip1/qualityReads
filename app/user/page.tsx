@@ -12,7 +12,7 @@ import SkeletonCustom from '@/components/ui/skeleton-custom';
 import { SmallCards } from '@/components/ui/main-cards';
 import { Pagination } from '@nextui-org/pagination';
 import { Button } from '@nextui-org/button';
-import { Bounce, ToastContainer } from "react-toastify";
+import ReadMoreModal from "@/components/posts/readMoreModal";
 
 export default function Page() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +24,17 @@ export default function Page() {
     const [isFound, setIsFound] = useState(true);
     const searchParams = useSearchParams();
     const userId = searchParams.get('id');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
     if (!userId) {
         notFound();
     };
@@ -56,20 +67,14 @@ export default function Page() {
         return (
             <ProtectedRoute>
                 <div className="min-h-screen flex flex-col items-center font-sans pb-4 ">
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        transition={Bounce}
-                        theme="light"
-                    />
+
                     <NavBar />
+                    <ReadMoreModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        title={modalTitle}
+                        content={modalContent}
+                    />
                     <div>
                         <div className=" flex justify-center items-center md:pt-10 md:mb-6 pt-4 mb-2">
 
@@ -105,6 +110,8 @@ export default function Page() {
                                     userDisliked={data.userDisliked}
                                     isPostInList={data.isPostInList}
                                     userId={userId}
+                                    onReadMore={handleOpenModal}
+
                                 />
                             ))}
                         </div>

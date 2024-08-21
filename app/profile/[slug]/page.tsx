@@ -6,6 +6,7 @@ import NavBar from "@/components/ui/navbar";
 import { PostData } from "@/app/genre/[slug]/page";
 import { SmallCards } from "@/components/ui/main-cards";
 import axios from "axios";
+import ReadMoreModal from "@/components/posts/readMoreModal";
 
 const SlugURL = ["liked", "disliked", "my-posts"];
 const isValidSlug = (slug: string) => {
@@ -23,6 +24,17 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [mainData, setMainData] = useState<PostData[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
         if (!isValidSlug(params.slug)) {
@@ -73,6 +85,12 @@ export default function Page({ params }: { params: { slug: string } }) {
                             <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                                 {stringMapping[params.slug]}
                             </h1>
+                            <ReadMoreModal
+                                isOpen={isModalOpen}
+                                onClose={handleCloseModal}
+                                title={modalTitle}
+                                content={modalContent}
+                            />
                             <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
                                 {(mainData.length) ? mainData.map((data, index) => (
                                     <SmallCards
@@ -90,6 +108,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                         userDisliked={data.userDisliked}
                                         isPostInList={data.isPostInList}
                                         userId={data.userId}
+                                        onReadMore={handleOpenModal}
                                     />
                                 )) : <p>Nothing to see here</p>}
                             </div>

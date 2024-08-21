@@ -82,6 +82,8 @@ const PostComponent = () => {
                 isOpen={isOpen}
                 placement={"auto"}
                 onOpenChange={onOpenChange}
+                isDismissable={false}
+                isKeyboardDismissDisabled={true}
             >
                 <ModalContent>
                     {(onClose) => (
@@ -94,7 +96,6 @@ const PostComponent = () => {
                                     className="max-w-xs"
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
-                                    maxLength={180}
                                 />
                                 <div className="flex flex-wrap">
                                     {parseHashtags(content)}

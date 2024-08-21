@@ -3,13 +3,15 @@
 import { NextUIProvider } from '@nextui-org/react'
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
-
+import { AblyProvider } from '@/components/context/AblyProvider';
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <SessionProvider>
             <NextUIProvider>
                 <NextThemesProvider attribute="class" defaultTheme='light'>
-                    {children}
+                    <AblyProvider>
+                        {children}
+                    </AblyProvider>
                 </NextThemesProvider>
             </NextUIProvider>
         </SessionProvider>

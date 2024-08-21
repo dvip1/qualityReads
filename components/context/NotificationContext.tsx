@@ -1,95 +1,128 @@
-// import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-// import { useSession } from 'next-auth/react';
-// import { useTheme } from 'next-themes';
-// import { toast } from 'react-toastify';
-// import io, { Socket } from 'socket.io-client';
-// import fetchUserData from '@/utils/fetchUserData';
+"use client"
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import * as Ably from "ably";
+import { toast } from "react-toastify";
+import { useSession } from 'next-auth/react';
 
-// type Notification = {
-//     type: string,
-//     message: string
-// };
+interface AblyContextType {
+    unreadCount: number;
+    resetUnreadCount: () => void;
+}
 
-// type NotificationContextType = {
-//     unreadCount: number,
-//     setUnreadCount: (count: number) => void
-// };
+const AblyContext = createContext<AblyContextType | undefined>(undefined);
 
-// const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+interface AblyProviderProps {
+    children: React.ReactNode;
+    userId: string;
+    theme: string;
+}
 
-// export function NotificationProvider({ children }: { children: ReactNode }) {
-//     const [unreadCount, setUnreadCount] = useState(0);
-//     const [userId, setUserId] = useState<string | undefined>(undefined);
-//     const [socket, setSocket] = useState<Socket | null>(null);
-//     const { data: session } = useSession();
-//     const { theme } = useTheme();
+export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [ably, setAbly] = useState<Ably.Realtime | null>(null);
+    const { data: session, status } = useSession();
 
-//     useEffect(() => {
-//         if (!session?.user?.email) return;
+    useEffect(() => {
+        if (!userId || !session) return;
 
-//         const getUserData = async () => {
-//             try {
-//                 const data = await fetchUserData();
-//                 setUserId(data._id);
-//             } catch (error) {
-//                 console.error('Failed to fetch user data', error);
-//             }
-//         };
+        const connectToAbly = async () => {
+            try {
+                const ablyInstance = new Ably.Realtime({ authUrl: `/api/Ably?userId=${userId}` });
+                await ablyInstance.connection.once('connected');
+                console.log('Ably connected');
 
-//         getUserData();
-//     }, [session?.user?.email]);
+                ablyInstance.connection.on('disconnected', () => {
+                    console.log('Ably connection disconnected');
+                    // Attempt to reconnect
+                    reconnectToAbly(ablyInstance);
+                });
 
-//     useEffect(() => {
-//         if (!userId) return;
+                ablyInstance.connection.on('closed', () => {
+                    console.log('Ably connection closed');
+                    // Attempt to reconnect
+                    reconnectToAbly(ablyInstance);
+                });
 
-//         const socketInitializer = async () => {
-//             await fetch('/api/notification?query=stream&userId=' + userId);
-//             const newSocket = io(undefined, {
-//                 query: { userId },
-//             });
+                setAbly(ablyInstance);
+            } catch (error) {
+                console.error('Error connecting to Ably:', error);
+            }
+        };
 
-//             newSocket.on('connect', () => {
-//                 console.log('Connected to socket');
-//             });
+        const reconnectToAbly = (ablyInstance: Ably.Realtime) => {
+            try {
+                ablyInstance.connection.connect();
+            } catch (error) {
+                console.error('Error reconnecting to Ably:', error);
+                // Implement fallback logic or notify the user
+            }
+        };
 
-//             newSocket.on('notification', (notification: Notification) => {
-//                 console.log("New Notification!", notification);
-//                 toast(" 📋 You have a new Notification!", {
-//                     position: "top-right",
-//                     autoClose: 3000,
-//                     hideProgressBar: false,
-//                     closeOnClick: true,
-//                     pauseOnHover: true,
-//                     draggable: true,
-//                     progress: undefined,
-//                     theme: theme === "dark" ? "dark" : "light",
-//                 });
-//                 setUnreadCount(prev => prev + 1);
-//             });
+        connectToAbly();
 
-//             setSocket(newSocket);
-//         };
+        return () => {
+            if (ably) {
+                ably.close();
+            }
+        };
+    }, [userId, session]);
 
-//         socketInitializer();
+    useEffect(() => {
+        if (!ably) {
+            console.warn('Ably instance is not available, skipping channel setup');
+            return;
+        }
 
-//         return () => {
-//             if (socket) {
-//                 socket.disconnect();
-//             }
-//         };
-//     }, [userId, theme]);
+        const channel = ably.channels.get(`notifications:${userId}`);
+        let activeToasts: React.ReactText[] = [];
 
-//     return (
-//         <NotificationContext.Provider value={{ unreadCount, setUnreadCount }}>
-//             {children}
-//         </NotificationContext.Provider>
-//     );
-// }
+        const handleNotification = (message: any) => {
+            try {
+                setUnreadCount((prevCount) => prevCount + 1);
+                const toastId = toast(`🔔 You have a new notification!`, {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: theme === 'dark' ? 'dark' : 'light',
+                    toastId: `notification-${new Date().getTime()}`,
+                });
+                activeToasts.push(toastId);
+            } catch (error) {
+                console.error('Error processing notification:', error);
+            }
+        };
 
-// export function useNotification() {
-//     const context = useContext(NotificationContext);
-//     if (context === undefined) {
-//         throw new Error('useNotification must be used within a NotificationProvider');
-//     }
-//     return context;
-// };
+        channel.subscribe('new-notification', handleNotification);
+
+        return () => {
+            console.log('Unsubscribing from channel and dismissing toasts');
+            if (channel) {
+                channel.unsubscribe('new-notification', handleNotification);
+            }
+            if (activeToasts.length > 0) {
+                activeToasts.forEach((id) => toast.dismiss(id));
+            }
+        };
+    }, [ably, userId, theme]);
+
+    const resetUnreadCount = () => {
+        setUnreadCount(0);
+    };
+
+    return (
+        <AblyContext.Provider value={{ unreadCount, resetUnreadCount }}>
+            {children}
+        </AblyContext.Provider>
+    );
+}
+export function useAbly() {
+    const context = useContext(AblyContext);
+    if (context === undefined) {
+        throw new Error('useAbly must be used within an AblyProvider');
+    }
+    return context;
+}

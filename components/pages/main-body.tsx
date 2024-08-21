@@ -4,16 +4,28 @@ import { PostData } from "@/app/genre/[slug]/page";
 import PostComponent from "@/components/posts/postComponent";
 import { BiSolidHomeCircle } from "react-icons/bi";
 import { useState, useEffect } from "react";
-import fetchHomeData from "@/utils/fetchHome";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
-import { Bounce, ToastContainer } from "react-toastify";
 import SkeletonCustom from "../ui/skeleton-custom";
+import axios from "axios";
+import ReadMoreModal from "../posts/readMoreModal";
+
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [mainData, setMainData] = useState<PostData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -22,9 +34,13 @@ export default function MainBody() {
                     page: currentPage,
                     limit: 15,
                 };
-                const result = await fetchHomeData(data);
-                setMainData(result.posts);
-                setTotalPages(Math.ceil(result.total / data.limit)); //  
+                const response = await axios.post("/api/fetch-posts", data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setMainData(response?.data?.posts);
+                setTotalPages(Math.ceil(response?.data?.total / data.limit)); //  
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -42,18 +58,11 @@ export default function MainBody() {
                     <span className="flex justify-center items-center">
                         <PostComponent />
                     </span>
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        transition={Bounce}
-                        theme="light"
+                    <ReadMoreModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        title={modalTitle}
+                        content={modalContent}
                     />
                     <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                         <BiSolidHomeCircle className="mr-2" /> Home
@@ -76,6 +85,7 @@ export default function MainBody() {
                                 userDisliked={data.userDisliked}
                                 isPostInList={data.isPostInList}
                                 userId={data.userId}
+                                onReadMore={handleOpenModal}
                             />
                         ))}
                     </div>

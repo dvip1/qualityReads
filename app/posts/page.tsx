@@ -9,8 +9,8 @@ import { PostData } from '../genre/[slug]/page';
 import Loading from '../loading';
 import { SmallCards } from '@/components/ui/main-cards';
 import SkeletonCustom from '@/components/ui/skeleton-custom';
-import { Bounce, ToastContainer } from "react-toastify";
 import { FaShareAlt } from "react-icons/fa";
+import ReadMoreModal from "@/components/posts/readMoreModal";
 
 export default function Page() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,6 +20,18 @@ export default function Page() {
     const [isFound, setIsFound] = useState(true);
     const searchParams = useSearchParams();
     const postId = searchParams.get('id');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
     if (!postId) {
         notFound();
     };
@@ -53,25 +65,18 @@ export default function Page() {
                 <div className="flex flex-col items-center w-full min-h-screen pb-10">
                     <NavBar />
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <ToastContainer
-                            position="bottom-center"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            transition={Bounce}
-                            theme="light"
+                        <ReadMoreModal
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                            title={modalTitle}
+                            content={modalContent}
                         />
                         {loading ? (
                             <span> <SkeletonCustom /></span>
                         ) : (
                             <>
-                            <div className="h-4 w-full "></div>
-    
+                                <div className="h-4 w-full "></div>
+
                                 {mainData && mainData.length > 0 && (
                                     <div className="mt-10">
                                         <SmallCards
@@ -89,6 +94,7 @@ export default function Page() {
                                             userDisliked={mainData[0].userDisliked}
                                             isPostInList={mainData[0].isPostInList}
                                             userId={mainData[0].userId}
+                                            onReadMore={handleOpenModal}
                                         />
                                     </div>
                                 )}
@@ -114,6 +120,7 @@ export default function Page() {
                                                     userDisliked={data.userDisliked}
                                                     isPostInList={data.isPostInList}
                                                     userId={data.userId}
+                                                    onReadMore={handleOpenModal}
                                                 />
                                             ))}
                                         </div>

@@ -4,7 +4,8 @@ import { ObjectId } from "mongodb";
 import fetchUserData from "./fetchUserData";
 import Trending from "@/lib/Trending";
 import { getRedisClient } from "@/lib/redis";
-import { PostNotificationData } from "@/app/notification/service";
+import { PostNotificationData, PostNoificationAbly } from "@/app/notification/service";
+
 export interface LikePostTypes {
     like: boolean
     postId: ObjectId
@@ -26,11 +27,12 @@ const LikePost = async (props: LikePostTypes) => {
         const userId = user ? user.user_id.toString() : null;
         const userData = await fetchUserData();
         await sendNotification(userId.toString(), props.postId.toString(), userData._id);
-        const updateOperation = await getUpdateOperation(Postcollection, props, userData._id);
+        const updateOperation = await getUpdateOperation(Postcollection, props, userData._id, userId);
         const updatedPost = await updatePost(Postcollection, props.postId.toString(), updateOperation);
+
         return formatResponse(updatedPost);
     } catch (e) {
-        throw new Error(`Error while liking a post ${e}`);
+        console.error(`Error while liking a post ${e}`);
     }
 };
 
@@ -61,13 +63,14 @@ const sendNotification = async (userId: string, postId: string, metaId: ObjectId
     await PostNotificationData(NotificationData)
 };
 
-const getUpdateOperation = async (Postcollection: any, props: LikePostTypes, userId: ObjectId) => {
+const getUpdateOperation = async (Postcollection: any, props: LikePostTypes, userId: ObjectId, metaId: string) => {
     const post = await Postcollection.findOne({ _id: new ObjectId(props.postId) });
     const isLiked = post?.liked_by?.includes(userId);
 
     if (isLiked) {
         return { $inc: { likes: -1 }, $pull: { liked_by: userId } };
     } else {
+        PostNoificationAbly(metaId);
         return { $inc: { likes: 1 }, $push: { liked_by: userId } };
     }
 };

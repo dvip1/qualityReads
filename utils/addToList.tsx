@@ -11,36 +11,33 @@ export interface MyListTypes {
 interface PullOperatorWithObjectId extends PullOperator<Document> {
     "myList": ObjectId;
 }
-
 const AddRemoveFromList = async (props: MyListTypes) => {
-    const client = await clientPromise;
-    const db = client.db();
-    const CurrentUserData = await fetchUserData();
-    const UserCollection = db.collection("users");
-    const redisClient = await getRedisClient()
-    const TrendingObject = new Trending(redisClient);
-
-
-    // Check if the postId is already in the "myList" array
-    const user = await UserCollection.findOne({
-        _id: CurrentUserData._id,
-        "myList": new ObjectId(props.postId),
-    });
-
-    if (user) {
-        // If the postId is already in the "myList" array, remove it
-        await UserCollection.updateOne(
-            { _id: CurrentUserData._id },
-            { $pull: { "myList": new ObjectId(props.postId) } as PullOperatorWithObjectId }
-        );
-        await TrendingObject.unlikePost("trending_daily", props.postId.toString());
-    } else {
-        // If the postId is not in the "myList" array, add it
-        await UserCollection.updateOne(
-            { _id: CurrentUserData._id },
-            { $addToSet: { "myList": new ObjectId(props.postId) } }
-        );
-        await TrendingObject.updatePostScore("trending_daily", props.postId.toString())
+    try {
+        const client = await clientPromise;
+        const db = client.db();
+        const CurrentUserData = await fetchUserData();
+        const UserCollection = db.collection("users");
+        const redisClient = await getRedisClient()
+        const TrendingObject = new Trending(redisClient);
+        const user = await UserCollection.findOne({
+            _id: CurrentUserData._id,
+            "myList": new ObjectId(props.postId),
+        });
+        if (user) {
+            await UserCollection.updateOne(
+                { _id: CurrentUserData._id },
+                { $pull: { "myList": new ObjectId(props.postId) } as PullOperatorWithObjectId }
+            );
+            await TrendingObject.unlikePost("trending_daily", props.postId.toString());
+        } else {
+            await UserCollection.updateOne(
+                { _id: new ObjectId(CurrentUserData._id) },
+                { $addToSet: { "myList": new ObjectId(props.postId) } }
+            );
+            await TrendingObject.updatePostScore("trending_daily", props.postId.toString())
+        }
+    } catch (error) {
+        console.error("An error occurred:", error);
     }
 };
 
