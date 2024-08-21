@@ -25,7 +25,7 @@ export default function Page() {
                             <li>Customize your profile with theme changes and settings. 🎨</li>
                             <li>Add posts to a list for later viewing. 📋</li>
                             <li>Share posts with friends. 📤</li>
-                            <li>Click on hashtags to find related posts (feature coming soon). 🔗</li>
+                            <li>Click on hashtags to find related posts. 🔗</li>
                             <li>View all posts by clicking on a profile or username. 👤</li>
                             <li>Explore trending posts and hashtags. 📈</li>
                             <li>Receive notifications when someone likes your posts. 🔔</li>
