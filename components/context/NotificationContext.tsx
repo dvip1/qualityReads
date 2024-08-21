@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as Ably from "ably";
 import { toast } from "react-toastify";
 import { Bounce, ToastContainer } from "react-toastify";
-
+import { useSession } from 'next-auth/react';
 interface AblyContextType {
     unreadCount: number;
     resetUnreadCount: () => void;
@@ -18,19 +18,26 @@ interface AblyProviderProps {
 export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
     const [unreadCount, setUnreadCount] = useState(0);
     const [ably, setAbly] = useState<Ably.Realtime | null>(null);
+    const { data: session, status } = useSession();
 
     useEffect(() => {
-        const ablyInstance = new Ably.Realtime({ authUrl: '/api/Ably?userId=' + userId });
+        if (!userId || !session) return;
+        const ablyInstance = new Ably.Realtime({ authUrl: `/api/Ably?userId=${userId}` });
+
         ablyInstance.connection.once('connected', () => {
+            console.log('Ably connected');
         });
+
         ablyInstance.connection.on('failed', (err) => {
             console.error(`[${new Date().toISOString()}] Ably connection failed:`, err);
         });
+
         setAbly(ablyInstance);
+
         return () => {
             ablyInstance.close();
         };
-    }, [userId]);
+    }, [userId, session]);
 
     useEffect(() => {
         if (!ably) {
