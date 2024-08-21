@@ -6,7 +6,6 @@ import { BiSolidHomeCircle } from "react-icons/bi";
 import { useState, useEffect } from "react";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
-import { Bounce, ToastContainer } from "react-toastify";
 import SkeletonCustom from "../ui/skeleton-custom";
 import axios from "axios";
 import ReadMoreModal from "../posts/readMoreModal";
@@ -59,19 +58,6 @@ export default function MainBody() {
                     <span className="flex justify-center items-center">
                         <PostComponent />
                     </span>
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        transition={Bounce}
-                        theme="light"
-                    />
                     <ReadMoreModal
                         isOpen={isModalOpen}
                         onClose={handleCloseModal}

@@ -9,7 +9,6 @@ import { PostData } from '../genre/[slug]/page';
 import Loading from '../loading';
 import { SmallCards } from '@/components/ui/main-cards';
 import SkeletonCustom from '@/components/ui/skeleton-custom';
-import { Bounce, ToastContainer } from "react-toastify";
 import { FaShareAlt } from "react-icons/fa";
 import ReadMoreModal from "@/components/posts/readMoreModal";
 
@@ -66,19 +65,6 @@ export default function Page() {
                 <div className="flex flex-col items-center w-full min-h-screen pb-10">
                     <NavBar />
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <ToastContainer
-                            position="bottom-center"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            transition={Bounce}
-                            theme="light"
-                        />
                         <ReadMoreModal
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}

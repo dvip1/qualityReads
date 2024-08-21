@@ -1,7 +1,6 @@
 "use client"
 import ProtectedRoute from "@/utils/protectedRoute"
 import NavBar from "@/components/ui/navbar"
-import { ToastContainer, Bounce } from "react-toastify"
 import isValidSlug from './isValidSlug'
 import { notFound, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from "react";
@@ -74,6 +73,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                             <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                                 <FcSearch />  search={params.slug}
                             </h1>
+                            
                             <ReadMoreModal
                                 isOpen={isModalOpen}
                                 onClose={handleCloseModal}

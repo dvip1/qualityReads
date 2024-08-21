@@ -13,7 +13,6 @@ import { Divider } from "@nextui-org/divider";
 import { ObjectId } from "mongodb";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
 import axios from "axios";
-import { Bounce, ToastContainer } from "react-toastify";
 import ReadMoreModal from "@/components/posts/readMoreModal";
 
 interface UserTypes {
@@ -90,19 +89,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                 <NavBar />
                 <div className="max-w-full flex justify-center">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <ToastContainer
-                            position="bottom-center"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            transition={Bounce}
-                            theme="light"
-                        />
+                      
                         <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                             {title}
                         </h1>

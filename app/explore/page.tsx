@@ -9,7 +9,6 @@ import axios from "axios";
 import FetchTrendingPost from "@/utils/fetchTrendingPost";
 import { SmallCards } from "@/components/ui/main-cards";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
-import { Bounce, ToastContainer } from "react-toastify";
 import ReadMoreModal from "@/components/posts/readMoreModal";
 export default function Page() {
     const [tags, setTags] = useState<string[]>();
@@ -65,19 +64,7 @@ export default function Page() {
                     />
                     <div className="max-w-full flex justify-center">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <ToastContainer
-                                position="bottom-center"
-                                autoClose={5000}
-                                hideProgressBar={false}
-                                newestOnTop
-                                closeOnClick
-                                rtl={false}
-                                pauseOnFocusLoss
-                                draggable
-                                pauseOnHover
-                                transition={Bounce}
-                                theme="light"
-                            />
+                         
                             <h1 className="mt-6 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                                 <MdOutlineTravelExplore className="mr-2" /> Explore
                             </h1>

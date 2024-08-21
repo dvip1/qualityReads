@@ -4,7 +4,6 @@ import { getAllNotification, getNotificationCount, ClearAllNotification, ClearBy
 import fetchUserData from "@/utils/fetchUserData";
 import ProtectedRoute from "@/utils/protectedRoute";
 import NavBar from "@/components/ui/navbar";
-import { Bounce, ToastContainer } from "react-toastify";
 import NotificationCard, { NotificationCardProps, Notification } from "./notificationCard";
 import { Card, CardBody, CardFooter } from '@nextui-org/card';
 import { Button } from "@nextui-org/button";
@@ -48,19 +47,7 @@ export default function Page() {
             <div className="min-h-screen pb-10">
                 <NavBar />
                 <div className="max-w-full flex flex-col items-center">
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        transition={Bounce}
-                        theme="light"
-                    />
+                
                     <h1 className="mt-10 mb-5 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                         Notifications
                     </h1>

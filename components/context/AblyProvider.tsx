@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AblyProvider as OriginalAblyProvider } from './NotificationContext';
 import fetchUserData from '@/utils/fetchUserData';
 import { useTheme } from 'next-themes';
-
+import { ToastContainer, Bounce } from 'react-toastify';
 interface AblyProviderProps {
     children: React.ReactNode;
 }
@@ -29,6 +29,19 @@ export function AblyProvider({ children }: AblyProviderProps) {
 
     return (
         <OriginalAblyProvider userId={userId} theme={theme}>
+            <ToastContainer
+                position="bottom-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                transition={Bounce}
+                theme={theme === 'dark' ? 'dark' : 'light'}
+            />
             {children}
         </OriginalAblyProvider>
     );

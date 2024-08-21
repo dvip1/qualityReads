@@ -1,6 +1,5 @@
 "use client"
 import ProtectedRoute from "@/utils/protectedRoute"
-import { ToastContainer, Bounce } from "react-toastify"
 import { LuBadgeInfo } from "react-icons/lu";
 import { Link } from "@nextui-org/react";
 import NavBar from "@/components/ui/navbar";
@@ -10,20 +9,6 @@ export default function Page() {
             <div className="min-h-screen pb-10 ">
                 <NavBar />
                 <div className="max-w-4xl mx-auto flex flex-col items-center px-4">
-                    <ToastContainer
-                        position="bottom-center"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        transition={Bounce}
-                        theme="light"
-                    />
-
                     <h1 className="mt-10 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center dark:text-white">
                         <LuBadgeInfo className="mr-2 text-blue-600" /> QualityReads
                     </h1>
