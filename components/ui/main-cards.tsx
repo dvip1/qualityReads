@@ -33,7 +33,7 @@ import { useRouter } from "next/navigation";
 import { FaShareAlt } from "react-icons/fa";
 import { SlOptionsVertical } from "react-icons/sl";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, cn } from "@nextui-org/react";
-
+import ReadMoreModal from "../posts/readMoreModal";
 export interface SmallCardsType {
   _id?: ObjectId;
   url: string;
@@ -48,6 +48,7 @@ export interface SmallCardsType {
   userDisliked: boolean;
   isPostInList: boolean;
   userId?: string;
+  onReadMore: (title: string, content: string) => void
 }
 function removeHashtags(text: string) {
   return text.replace(/#[^\s#]+/g, "").trim();
@@ -67,10 +68,14 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
   const [likes, setLikes] = useState(props.likes);
   const [dislikes, setDislikes] = useState(props.dislikes);
   const [addList, setAddList] = useState(props.isPostInList);
+
   const propId = props._id;
   const { theme } = useTheme();
   const iconClasses = "text-xl text-default-500 pointer-events-none flex-shrink-0";
   const isWebShareSupported = navigator.share !== undefined;
+  const content = removeHashtags(props.content);
+  const shouldShowReadMore = content.length > 172;
+
   const optionItems = [
     {
       key: "Share",
@@ -213,6 +218,11 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
       });
     }
   };
+
+  const toggleReadMore = () => {
+    props.onReadMore(props.title, props.content);
+  };
+
   return (
     <>
       <Card className="max-w-[350px]  my-2 " isBlurred>
@@ -240,7 +250,12 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
         <CardBody className="flex flex-col gap-1">
           <p className="text-small ">{props.title}</p>
           <p className="text-small text-black/60 dark:text-white/60">
-            {removeHashtags(props.content)}
+            {content.slice(0, 172)}
+            {content.length > 172 && (
+              <span onClick={toggleReadMore} className="text-blue-500 hover:underline cursor-pointer">
+                {'..read more'}
+              </span>
+            )}
           </p>
 
           <Link href={props.url} showAnchorIcon target="_blank">

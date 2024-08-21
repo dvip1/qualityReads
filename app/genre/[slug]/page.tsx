@@ -14,6 +14,7 @@ import { ObjectId } from "mongodb";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
 import axios from "axios";
 import { Bounce, ToastContainer } from "react-toastify";
+import ReadMoreModal from "@/components/posts/readMoreModal";
 
 interface UserTypes {
     name: string;
@@ -38,6 +39,17 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [isLoading, setIsLoading] = useState(true); // Added state for loading
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     if (!isValidSlug(params.slug))
         notFound();
@@ -94,6 +106,12 @@ export default function Page({ params }: { params: { slug: string } }) {
                         <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                             {title}
                         </h1>
+                        <ReadMoreModal
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                            title={modalTitle}
+                            content={modalContent}
+                        />
                         <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
                             {isLoading ? <span> <SkeletonCustom />
                             </span> : mainData?.map((data, index) => (
@@ -112,6 +130,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     userDisliked={data.userDisliked}
                                     isPostInList={data.isPostInList}
                                     userId={data.userId}
+                                    onReadMore={handleOpenModal}
                                 />
                             ))}
                         </div>

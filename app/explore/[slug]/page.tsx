@@ -11,6 +11,7 @@ import NothingToSeeHere from "@/components/ui/nothingtosee";
 import axios from "axios"
 import { FcSearch } from "react-icons/fc";
 import SkeletonCustom from "@/components/ui/skeleton-custom"
+import ReadMoreModal from "@/components/posts/readMoreModal";
 
 export default function Page({ params }: { params: { slug: string } }) {
     const searchParams = useSearchParams();
@@ -19,11 +20,22 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [mainData, setMainData] = useState<PostData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
         if (!isValidSlug(params.slug) || !query)
             notFound();
-    }, [params.slug]);
+    }, [params.slug, query]);
 
     useEffect(() => {
         let tags = [];
@@ -50,7 +62,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             }
         };
         fetchData();
-    }, [currentPage]);
+    }, [currentPage, query, params.slug]);
 
     return (
         <>
@@ -62,6 +74,12 @@ export default function Page({ params }: { params: { slug: string } }) {
                             <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                                 <FcSearch />  search={params.slug}
                             </h1>
+                            <ReadMoreModal
+                                isOpen={isModalOpen}
+                                onClose={handleCloseModal}
+                                title={modalTitle}
+                                content={modalContent}
+                            />
                             <div className="mt-10 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-none">
                                 {loading ? (
                                     <SkeletonCustom />
@@ -82,6 +100,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                             userDisliked={data.userDisliked}
                                             isPostInList={data.isPostInList}
                                             userId={data.userId}
+                                            onReadMore={handleOpenModal}
                                         />
                                     ))
                                 ) : (

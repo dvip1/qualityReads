@@ -1,8 +1,9 @@
+"use client"
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as Ably from "ably";
 import { toast } from "react-toastify";
-import { Bounce, ToastContainer } from "react-toastify";
 import { useSession } from 'next-auth/react';
+
 interface AblyContextType {
     unreadCount: number;
     resetUnreadCount: () => void;
@@ -15,6 +16,7 @@ interface AblyProviderProps {
     userId: string;
     theme: string;
 }
+
 export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
     const [unreadCount, setUnreadCount] = useState(0);
     const [ably, setAbly] = useState<Ably.Realtime | null>(null);
@@ -22,49 +24,88 @@ export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
 
     useEffect(() => {
         if (!userId || !session) return;
-        const ablyInstance = new Ably.Realtime({ authUrl: `/api/Ably?userId=${userId}` });
 
-        ablyInstance.connection.once('connected', () => {
-            console.log('Ably connected');
-        });
+        const connectToAbly = async () => {
+            try {
+                const ablyInstance = new Ably.Realtime({ authUrl: `/api/Ably?userId=${userId}` });
+                await ablyInstance.connection.once('connected');
+                console.log('Ably connected');
 
-        ablyInstance.connection.on('failed', (err) => {
-            console.error(`[${new Date().toISOString()}] Ably connection failed:`, err);
-        });
+                ablyInstance.connection.on('disconnected', () => {
+                    console.log('Ably connection disconnected');
+                    // Attempt to reconnect
+                    reconnectToAbly(ablyInstance);
+                });
 
-        setAbly(ablyInstance);
+                ablyInstance.connection.on('closed', () => {
+                    console.log('Ably connection closed');
+                    // Attempt to reconnect
+                    reconnectToAbly(ablyInstance);
+                });
+
+                setAbly(ablyInstance);
+            } catch (error) {
+                console.error('Error connecting to Ably:', error);
+            }
+        };
+
+        const reconnectToAbly = (ablyInstance: Ably.Realtime) => {
+            try {
+                ablyInstance.connection.connect();
+            } catch (error) {
+                console.error('Error reconnecting to Ably:', error);
+                // Implement fallback logic or notify the user
+            }
+        };
+
+        connectToAbly();
 
         return () => {
-            ablyInstance.close();
+            if (ably) {
+                ably.close();
+            }
         };
     }, [userId, session]);
 
     useEffect(() => {
         if (!ably) {
+            console.warn('Ably instance is not available, skipping channel setup');
             return;
         }
+
         const channel = ably.channels.get(`notifications:${userId}`);
-        let activeToasts: React.ReactText[] = []; // Array to store active toast IDs
+        let activeToasts: React.ReactText[] = [];
+
         const handleNotification = (message: any) => {
-            setUnreadCount((prevCount) => prevCount + 1);
-            const toastId = toast(`🔔 You have a new notification!`, {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: theme === "dark" ? "dark" : "light",
-                toastId: `notification-${new Date().getTime()}` // Unique toast ID
-            });
-            activeToasts.push(toastId);
+            try {
+                setUnreadCount((prevCount) => prevCount + 1);
+                const toastId = toast(`🔔 You have a new notification!`, {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: theme === 'dark' ? 'dark' : 'light',
+                    toastId: `notification-${new Date().getTime()}`,
+                });
+                activeToasts.push(toastId);
+            } catch (error) {
+                console.error('Error processing notification:', error);
+            }
         };
+
         channel.subscribe('new-notification', handleNotification);
 
         return () => {
-            channel.unsubscribe('new-notification', handleNotification);
-            activeToasts.forEach(id => toast.dismiss(id));
+            console.log('Unsubscribing from channel and dismissing toasts');
+            if (channel) {
+                channel.unsubscribe('new-notification', handleNotification);
+            }
+            if (activeToasts.length > 0) {
+                activeToasts.forEach((id) => toast.dismiss(id));
+            }
         };
     }, [ably, userId, theme]);
 

@@ -9,11 +9,24 @@ import { Button } from "@nextui-org/button";
 import { Bounce, ToastContainer } from "react-toastify";
 import SkeletonCustom from "../ui/skeleton-custom";
 import axios from "axios";
+import ReadMoreModal from "../posts/readMoreModal";
+
 export default function MainBody() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [mainData, setMainData] = useState<PostData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -59,6 +72,12 @@ export default function MainBody() {
                         transition={Bounce}
                         theme="light"
                     />
+                    <ReadMoreModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        title={modalTitle}
+                        content={modalContent}
+                    />
                     <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                         <BiSolidHomeCircle className="mr-2" /> Home
                     </h1>
@@ -80,6 +99,7 @@ export default function MainBody() {
                                 userDisliked={data.userDisliked}
                                 isPostInList={data.isPostInList}
                                 userId={data.userId}
+                                onReadMore={handleOpenModal}
                             />
                         ))}
                     </div>

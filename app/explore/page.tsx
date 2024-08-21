@@ -10,14 +10,24 @@ import FetchTrendingPost from "@/utils/fetchTrendingPost";
 import { SmallCards } from "@/components/ui/main-cards";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
 import { Bounce, ToastContainer } from "react-toastify";
-
+import ReadMoreModal from "@/components/posts/readMoreModal";
 export default function Page() {
     const [tags, setTags] = useState<string[]>();
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [trendingData, setTrendingData] = useState<PostData[]>([]);
     const [isLoading, setIsLoading] = useState(true); // Added state for loading
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalContent, setModalContent] = useState('');
+    const handleOpenModal = (title: string, content: string) => {
+        setModalTitle(title);
+        setModalContent(content);
+        setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true); // Start loading
@@ -47,6 +57,12 @@ export default function Page() {
                 <div className="flex flex-col items-center w-full min-h-screen pb-10">
 
                     <NavBar />
+                    <ReadMoreModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        title={modalTitle}
+                        content={modalContent}
+                    />
                     <div className="max-w-full flex justify-center">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <ToastContainer
@@ -107,6 +123,7 @@ export default function Page() {
                                             userDisliked={data.userDisliked}
                                             isPostInList={data.isPostInList}
                                             userId={data.userId}
+                                            onReadMore={handleOpenModal}
                                         />
                                     ))}
                                 </div>
