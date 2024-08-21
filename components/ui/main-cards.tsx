@@ -248,15 +248,18 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
           </Link>
           <div className="flex flex-wrap mt-auto">
             {props.tags &&
-              props.tags.map((item, index) => (
-                <p
-                  key={index}
-                  className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"
-                >
-                  {" "}
-                  {item}
-                </p>
-              ))}
+              props.tags.map((item, index) => {
+                const tagName = item.startsWith('#') ? item.slice(1) : item;
+                return (
+                  <Link key={index} href={`/explore/tags?query=${tagName}`}>
+                    <p
+                      className="bg-[#ffffffaa] backdrop-blur-md bg-opacity-30 text-black/70 text-small inline-block mr-2 mb-2 rounded-xl p-1 border border-white border-opacity-20 shadow-md transition-colors duration-200 hover:bg-blue-500 hover:text-white cursor-pointer dark:bg-[#1e1e1e] dark:text-gray-300 dark:hover:bg-blue-700 dark:hover:text-white"
+                    >
+                      {tagName}
+                    </p>
+                  </Link>
+                );
+              })}
           </div>
         </CardBody>
         <Divider />
@@ -314,18 +317,6 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
                 )}
               </DropdownMenu>
             </Dropdown>
-
-            {/* {addList ? (
-              <HiMinusCircle
-                onClick={handleAddToList}
-                className="text-2xl text-[#C8CFA0] hover:text-blue-500 dark:hover:text-blue-500"
-              />
-            ) : (
-              <BsPatchPlusFill
-                onClick={handleAddToList}
-                className="text-2xl text-[#78ABA8] hover:text-blue-500"
-              />
-            )} */}
           </span>
         </CardFooter>
       </Card>
