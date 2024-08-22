@@ -252,7 +252,7 @@ export const SmallCards: React.FC<SmallCardsType> = (props) => {
           <p className="text-small text-black/60 dark:text-white/60">
             {content.slice(0, 172)}
             {content.length > 172 && (
-              <span onClick={toggleReadMore} className="text-blue-500 hover:underline cursor-pointer">
+              <span onClick={toggleReadMore} className="text-blue-800/90 dark:text-blue-400/90 hover:underline cursor-pointer">
                 {'..read more'}
               </span>
             )}
