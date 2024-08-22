@@ -33,6 +33,7 @@ export default function MainBody() {
                 const data = {
                     page: currentPage,
                     limit: 15,
+                    defaultRanking: "true"
                 };
                 const response = await axios.post("/api/fetch-posts", data, {
                     headers: {

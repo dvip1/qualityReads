@@ -1,5 +1,5 @@
 import { Collection, ObjectId } from "mongodb";
-import { createGivenPostPipeline } from "./pipelineMethods";
+import { createGivenPostPipeline, createRankingPipeline } from "./pipelineMethods";
 async function getGivenPost(PostCollection: Collection, givenPostId: string) {
     const givenPost = await PostCollection.findOne({
         _id: new ObjectId(givenPostId),
@@ -102,7 +102,11 @@ async function buildPipeline(filters: any, query: any, UserData: any, PostCollec
     if (filters.givenPostId) {
         const givenPost = await getGivenPost(PostCollection, filters.givenPostId);
         pipeline = createGivenPostPipeline(givenPost);
-    } else {
+    }
+    else if (filters.defaultRanking) {
+        pipeline = createRankingPipeline();
+    }
+    else {
         pipeline = createDefaultPipeline(query);
     }
 

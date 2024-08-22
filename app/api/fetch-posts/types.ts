@@ -7,6 +7,7 @@ export interface PostList {
     usersPost?: boolean;
     likedByUser?: boolean;
     dislikedByUser?: boolean;
+    defaultRanking?: boolean;
     sortBy?: "liked" | "recent" | "disliked";
     postIdInArray: string[];
     givenPostId: string;
