@@ -106,6 +106,12 @@ export default function NavBar() {
                             <p className="font-semibold">Signed in as</p>
                             <p className="font-semibold">{session?.user?.email}</p>
                         </DropdownItem>
+                        <DropdownItem key="notification"
+                            onClick={handleBellClick}
+                            startContent={<IoNotifications className={iconClass} />}
+                        >
+                            Notifications
+                        </DropdownItem>
                         <DropdownItem key="my-list"
                             onClick={handleListClick}
                             startContent={<FaBook className={iconClass} />}
@@ -118,12 +124,7 @@ export default function NavBar() {
                         >
                             Settings
                         </DropdownItem>
-                        <DropdownItem key="notification"
-                            onClick={handleBellClick}
-                            startContent={<IoNotifications className={iconClass} />}
-                        >
-                            Notification
-                        </DropdownItem>
+                        
                         <DropdownItem key="logout"
                             color="danger"
                             onClick={handleSignOut}
@@ -158,6 +159,11 @@ export default function NavBar() {
                 <NavbarMenuItem >
                     <Link className="w-full" href="/profile" size="lg">
                         Profile
+                    </Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem >
+                    <Link className="w-full" href="/notification" size="lg">
+                        Notificaions
                     </Link>
                 </NavbarMenuItem>
             </NavbarMenu>
