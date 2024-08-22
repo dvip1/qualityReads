@@ -10,6 +10,8 @@ import FetchTrendingPost from "@/utils/fetchTrendingPost";
 import { SmallCards } from "@/components/ui/main-cards";
 import SkeletonCustom from "@/components/ui/skeleton-custom";
 import ReadMoreModal from "@/components/posts/readMoreModal";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function Page() {
     const [tags, setTags] = useState<string[]>();
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,6 +21,7 @@ export default function Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState('');
     const [modalContent, setModalContent] = useState('');
+    const router = useRouter();
     const handleOpenModal = (title: string, content: string) => {
         setModalTitle(title);
         setModalContent(content);
@@ -64,7 +67,7 @@ export default function Page() {
                     />
                     <div className="max-w-full flex justify-center">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                         
+
                             <h1 className="mt-6 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
                                 <MdOutlineTravelExplore className="mr-2" /> Explore
                             </h1>
@@ -72,18 +75,19 @@ export default function Page() {
                             <div className="xl:max-w-none">
                                 <div className="p-6 ">
                                     <div className="bg-gray-100/80 dark:bg-[#393646] rounded-2xl shadow-lg p-4 w-fit">
-                                        <h2 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200">
+                                        <h2 className="text-xl font-bold mb-3 text-gray-800 dark:text-gray-200 ">
                                             Today&apos;s Trending Hashtags
                                         </h2>
-                                        <div className="bg-white/70 dark:bg-[#4F4557] rounded-xl p-3 ">
-                                            <div className="flex flex-wrap gap-2 ">
+                                        <div className="bg-white/70 dark:bg-[#4F4557] rounded-xl p-3">
+                                            <div className="flex flex-wrap gap-2">
                                                 {tags && tags.map((tag, index) => (
-                                                    <span
+                                                    <Link
                                                         key={index}
-                                                        className="px-3 py-1 bg-blue-100/80 dark:bg-[#6D5D6E] text-blue-800 dark:text-[#F4EEE0] rounded-full text-sm font-medium backdrop-blur-sm"
+                                                        className="px-3 py-1 bg-blue-100/80 dark:bg-[#6D5D6E] text-blue-800 dark:text-[#F4EEE0] rounded-full text-sm font-medium backdrop-blur-sm transition duration-300 transform hover:bg-blue-200 dark:hover:bg-[#7D6D7E] cursor-pointer"
+                                                        href={`/explore/tags?query=${tag.slice(1)}`}
                                                     >
                                                         {tag}
-                                                    </span>
+                                                    </Link>
                                                 ))}
                                             </div>
                                         </div>
