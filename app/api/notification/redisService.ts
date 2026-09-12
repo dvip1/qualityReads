@@ -113,9 +113,9 @@ class RedisNotificationService {
       let notifications: Notification[] = JSON.parse(notificationsStr);
       console.log(`notifications: ${JSON.stringify(notifications)}`);
       const initialLength = notifications.length;
-      notifications = notifications.filter(n => {
-        const match = n.id.trim() !== notificationId.trim();
-      });
+      // The predicate used to have a block body with no return, so it always
+      // yielded [] -- dismissing one notification wiped the whole list.
+      notifications = notifications.filter(n => n.id.trim() !== notificationId.trim());
       console.log('filter notifications', JSON.stringify(notifications));
 
       if (notifications.length < initialLength) {

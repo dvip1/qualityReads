@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import ProtectedRoute from "@/utils/protectedRoute";
 import NavBar from "@/components/ui/navbar";
@@ -19,7 +19,8 @@ const stringMapping: { [key: string]: string } = {
 }
 
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = use(params);
     const [sendParams, setSendParams] = useState<string>("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -37,7 +38,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     };
 
     useEffect(() => {
-        if (!isValidSlug(params.slug)) {
+        if (!isValidSlug(slug)) {
             notFound();
         }
         const paramMapping: { [key: string]: string } = {
@@ -46,11 +47,11 @@ export default function Page({ params }: { params: { slug: string } }) {
             "my-posts": "usersPost",
         };
 
-        const currentParam = paramMapping[params.slug];
+        const currentParam = paramMapping[slug];
         if (currentParam) {
             setSendParams(currentParam);
         }
-    }, [params.slug]);
+    }, [slug]);
 
     useEffect(() => {
         if (sendParams) {
@@ -83,7 +84,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                     <div className="max-w-full flex justify-center">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
-                                {stringMapping[params.slug]}
+                                {stringMapping[slug]}
                             </h1>
                             <ReadMoreModal
                                 isOpen={isModalOpen}

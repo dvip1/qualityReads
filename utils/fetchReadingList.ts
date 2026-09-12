@@ -1,6 +1,6 @@
 "use server"
 import { ObjectId } from 'mongodb';
-import clientPromise from "@/lib/db";
+import { getMongoClient } from "@/lib/db";
 import fetchUserData from "./fetchUserData";
 
 interface ReadingTypes {
@@ -11,7 +11,7 @@ interface ReadingTypes {
 export default async function FetchReadingList(props: ReadingTypes) {
     try {
         const CurrentUserData = await fetchUserData();
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
         const UserCollection = db.collection("users");
         const PostCollection = db.collection("posts");

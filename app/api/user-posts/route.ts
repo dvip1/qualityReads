@@ -1,4 +1,4 @@
-import clientPromise from '@/lib/db'
+import { getMongoClient } from '@/lib/db'
 import { UserTypes } from '@/app/profile/page';
 import { auth } from '@/auth';
 import { ObjectId } from 'mongodb';
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
         const requestData = await req.json();
         console.log("Request data:", requestData);
 
-        const client = await clientPromise;
+        const client = await getMongoClient();
         console.log("Database client obtained");
 
         const session = await auth();

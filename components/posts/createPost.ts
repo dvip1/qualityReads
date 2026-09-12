@@ -1,5 +1,5 @@
 "use server"
-import clientPromise from '@/lib/db';
+import { getMongoClient } from '@/lib/db';
 import { auth } from '@/auth';
 import { UserTypes } from '@/app/profile/page';
 import { ObjectId } from 'mongodb';
@@ -17,7 +17,7 @@ const CreatePost = async (postData: postDataTypes) => {
     try {
         console.log("Starting CreatePost function");
         const session = await auth();
-        const client = await clientPromise;
+        const client = await getMongoClient();
         console.log("Database client obtained");
         const db = client.db();
         const Postcollection = db.collection('posts');
@@ -33,7 +33,7 @@ const CreatePost = async (postData: postDataTypes) => {
             "liked_by": [],
             "disliked_by": []
         }
-        const redisClient = await getRedisClient()
+        const redisClient = getRedisClient()
         const TrendingObject = new Trending(redisClient);
         const result = await Postcollection.insertOne(insertData);
         const insertedPostId = result.insertedId;

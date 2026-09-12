@@ -15,7 +15,7 @@ export async function GET(req: Request) {
             return Response.json({ message: "Insufficient data" }, { status: 400 });
         }
 
-        const redisClient = await getRedisClient();
+        const redisClient = getRedisClient();
         const notificationService = new RedisNotificationService(redisClient);
 
         switch (query) {
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
             }
         };
 
-        const redisClient = await getRedisClient();
+        const redisClient = getRedisClient();
         const NotificationServiceObject = new RedisNotificationService(redisClient);
         await NotificationServiceObject.upsertNotification(requestData.userId, requestData.type, data);
         return Response.json({ "message": "successfully inserted notification" }, { status: 200 });
@@ -82,7 +82,7 @@ export async function DELETE(req: Request) {
         const userId = searchParams.get("userId");
         const type = searchParams.get("type");
         const postId = searchParams.get("postId");
-        const redisClient = await getRedisClient();
+        const redisClient = getRedisClient();
         const NotificationServiceObject = new RedisNotificationService(redisClient);
 
         if (userId && type && postId) {

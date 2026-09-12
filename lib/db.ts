@@ -1,40 +1,45 @@
-// This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
-import { MongoClient, ServerApiVersion } from "mongodb"
- 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
+// Adapted from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
+//
+// The connection is created lazily rather than at module scope so that importing
+// this file has no side effects. Next evaluates every route module during the
+// "Collecting page data" phase of `next build`, so a module-scope connect() would
+// make the build require a reachable database — and bake secrets into build args.
+import { MongoClient } from "mongodb"
+
+// No `serverApi` here: that is an Atlas Stable-API setting. Against a self-hosted
+// mongod, `strict: true` rejects any command outside the Stable API (which is how
+// index creation was failing silently).
+const options = {}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var _mongoClientPromise: Promise<MongoClient> | undefined
 }
- 
-const uri = process.env.MONGODB_URI
-const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-}
- 
-let client
-let clientPromise: Promise<MongoClient>
- 
-if (process.env.NODE_ENV === "development") {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>
-  } 
- 
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options)
-    globalWithMongo._mongoClientPromise = client.connect()
+
+/**
+ * Returns a shared, connected MongoClient.
+ *
+ * The promise is cached on globalThis in production as well as development:
+ * Next isolates route modules, so a module-scoped cache can end up creating
+ * several connection pools inside a single process.
+ */
+export function getMongoClient(): Promise<MongoClient> {
+  const uri = process.env.MONGODB_URI
+  if (!uri) {
+    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
   }
-  clientPromise = globalWithMongo._mongoClientPromise
-} else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri, options)
-  clientPromise = client.connect()
+
+  if (!global._mongoClientPromise) {
+    const client = new MongoClient(uri, options)
+    global._mongoClientPromise = client.connect().catch((error) => {
+      // Clear the cache so the next request retries instead of resolving a
+      // permanently-rejected promise (an unhandled rejection kills Node 22).
+      global._mongoClientPromise = undefined
+      throw error
+    })
+  }
+
+  return global._mongoClientPromise
 }
- 
-// Export a module-scoped MongoClient promise. By doing this in a
-// separate module, the client can be shared across functions.
-export default clientPromise
+
+export default getMongoClient

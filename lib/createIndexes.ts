@@ -1,8 +1,8 @@
-import clientPromise from './db';
+import { getMongoClient } from './db';
 
 async function createOptimizedIndexes() {
     try {
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
 
         // Create compound index for tags and category
@@ -13,7 +13,6 @@ async function createOptimizedIndexes() {
             },
             {
                 name: 'tags_category_index',
-                background: true,
             }
         );
 
@@ -25,7 +24,6 @@ async function createOptimizedIndexes() {
             },
             {
                 name: 'user_created_at_index',
-                background: true,
             }
         );
 
@@ -36,7 +34,6 @@ async function createOptimizedIndexes() {
             },
             {
                 name: 'likes_index',
-                background: true,
             }
         );
 
@@ -47,7 +44,6 @@ async function createOptimizedIndexes() {
             },
             {
                 name: 'dislikes_index',
-                background: true,
             }
         );
 

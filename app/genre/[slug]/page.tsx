@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import isValidSlug from "./isValidSlug";
 import { SlugToTitle } from "./data";
 import { SmallCards } from "@/components/ui/main-cards";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import fetchGenreData from "./fetchGenreData";
 import { Pagination } from "@nextui-org/pagination";
 import { Button } from "@nextui-org/button";
@@ -34,7 +34,8 @@ export interface PostData {
     isPostInList: boolean
     userId: string
 }
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = use(params);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0); // New state variable for total pages
     const [isLoading, setIsLoading] = useState(true); // Added state for loading
@@ -50,10 +51,10 @@ export default function Page({ params }: { params: { slug: string } }) {
         setIsModalOpen(false);
     };
 
-    if (!isValidSlug(params.slug))
+    if (!isValidSlug(slug))
         notFound();
 
-    const title = SlugToTitle[params.slug];
+    const title = SlugToTitle[slug];
     const [mainData, setMainData] = useState<PostData[]>([]);
     useEffect(() => {
         const fetchData = async () => {
