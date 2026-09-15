@@ -1,5 +1,5 @@
 /* Fetches posts in general, fetches filtered posts */
-import clientPromise from "@/lib/db";
+import { getMongoClient } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import { auth } from "@/auth";
 import { UserTypes } from "@/app/profile/page";
@@ -9,7 +9,7 @@ import { buildPipeline } from "./pipeline";
 export async function POST(req: Request) {
   try {
     const filters: PostList = await req.json();
-    const client = await clientPromise;
+    const client = await getMongoClient();
     const session = await auth();
     const db = client.db();
     const UserCollection = db.collection("users");

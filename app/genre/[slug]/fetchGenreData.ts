@@ -1,5 +1,5 @@
 "use server"
-import clientPromise from "@/lib/db";
+import { getMongoClient } from "@/lib/db";
 import fetchUserData from "@/utils/fetchUserData";
 interface fetchGenreTypes {
     category: string
@@ -9,7 +9,7 @@ interface fetchGenreTypes {
 
 const fetchGenreData = async (props: fetchGenreTypes) => {
     try {
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
         const Postcollection = db.collection('posts');
         const Userscollection = db.collection('users');

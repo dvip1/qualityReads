@@ -1,17 +1,25 @@
 import { Metadata } from 'next'
 import { headers } from 'next/headers'
-import { Inter } from "next/font/google";
-import { createOptimizedIndexes } from "@/lib/createIndexes";
+import localFont from "next/font/local";
 import { Providers } from "./providers";
 import "./globals.css";
 import 'react-toastify/ReactToastify.css';
 
-createOptimizedIndexes();
-const inter = Inter({ subsets: ["latin"] });
+// Vendored rather than pulled from next/font/google: that made `next build`
+// require egress to fonts.googleapis.com. This is the same latin-subset Inter
+// variable file, served from our own origin.
+const inter = localFont({
+  src: "./fonts/Inter-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
+  variable: "--font-inter",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+});
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = headers()
-  const domain = headersList.get('host') || 'quality-reads-tau.vercel.app'
+  const headersList = await headers()
+  const domain = headersList.get('host') || 'reads.client.dvippatel.in'
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
 
   return {

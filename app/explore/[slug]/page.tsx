@@ -3,7 +3,7 @@ import ProtectedRoute from "@/utils/protectedRoute"
 import NavBar from "@/components/ui/navbar"
 import isValidSlug from './isValidSlug'
 import { notFound, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { PostData } from "@/app/genre/[slug]/page"
 import { SmallCards } from "@/components/ui/main-cards"
 import NothingToSeeHere from "@/components/ui/nothingtosee";
@@ -12,7 +12,8 @@ import { FcSearch } from "react-icons/fc";
 import SkeletonCustom from "@/components/ui/skeleton-custom"
 import ReadMoreModal from "@/components/posts/readMoreModal";
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = use(params);
     const searchParams = useSearchParams();
     const query = searchParams.get('query');
     const [totalPages, setTotalPages] = useState(0);
@@ -32,19 +33,19 @@ export default function Page({ params }: { params: { slug: string } }) {
     };
 
     useEffect(() => {
-        if (!isValidSlug(params.slug) || !query)
+        if (!isValidSlug(slug) || !query)
             notFound();
-    }, [params.slug, query]);
+    }, [slug, query]);
 
     useEffect(() => {
         let tags = [];
-        if (params.slug === 'tags') {
+        if (slug === 'tags') {
             tags.push("#" + query);
         }
         const mainParams = {
             page: currentPage,
             limit: 15,
-            [params.slug]: tags.length ? tags : query
+            [slug]: tags.length ? tags : query
         };
         const fetchData = async () => {
             try {
@@ -61,7 +62,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             }
         };
         fetchData();
-    }, [currentPage, query, params.slug]);
+    }, [currentPage, query, slug]);
 
     return (
         <>
@@ -71,7 +72,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                     <div className="max-w-full flex justify-center">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h1 className="mt-10 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
-                                <FcSearch />  search={params.slug}
+                                <FcSearch />  search={slug}
                             </h1>
                             
                             <ReadMoreModal

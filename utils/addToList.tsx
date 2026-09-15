@@ -1,5 +1,5 @@
 "use server"
-import clientPromise from "@/lib/db"
+import { getMongoClient } from "@/lib/db"
 import fetchUserData from "./fetchUserData"
 import { ObjectId, PullOperator, Document } from "mongodb";
 import { getRedisClient } from "@/lib/redis";
@@ -13,11 +13,11 @@ interface PullOperatorWithObjectId extends PullOperator<Document> {
 }
 const AddRemoveFromList = async (props: MyListTypes) => {
     try {
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
         const CurrentUserData = await fetchUserData();
         const UserCollection = db.collection("users");
-        const redisClient = await getRedisClient()
+        const redisClient = getRedisClient()
         const TrendingObject = new Trending(redisClient);
         const user = await UserCollection.findOne({
             _id: CurrentUserData._id,

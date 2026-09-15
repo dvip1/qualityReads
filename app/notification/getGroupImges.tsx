@@ -1,9 +1,9 @@
 "use server"
-import clientPromise from "@/lib/db"
+import { getMongoClient } from "@/lib/db"
 import { ObjectId } from 'mongodb';
 
 export default async function getGroupImages(userIds: string[]) {
-    const client = await clientPromise;
+    const client = await getMongoClient();
     const db = client.db();
     const UserCollection = db.collection("users");
 

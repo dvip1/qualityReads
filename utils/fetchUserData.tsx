@@ -1,11 +1,11 @@
 "use server"
 import { auth } from '@/auth';
 import { UserTypes } from '@/app/profile/page';
-import clientPromise from "@/lib/db";
+import { getMongoClient } from "@/lib/db";
 import { cache } from 'react';
 const fetchUserData = cache(async () => {
     try {
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const session = await auth();
         const db = client.db();
         const collection = db.collection("users");

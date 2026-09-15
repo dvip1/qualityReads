@@ -1,0 +1,37 @@
+# Build context hygiene. node_modules in particular is ~700MB here and would
+# also risk leaking host-built native binaries into the image.
+.git
+.gitignore
+.github
+
+node_modules
+.next
+out
+build
+coverage
+
+.env
+.env.*
+!.env.example
+*.pem
+
+Dockerfile*
+compose*.yaml
+compose*.yml
+docker-compose*.yml
+.dockerignore
+docker/
+seed/
+
+DEPLOY.md
+README.md
+LICENSE
+.vscode
+.idea
+.claude
+.vercel
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-error.log*

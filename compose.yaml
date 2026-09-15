@@ -1,0 +1,123 @@
+name: qualityreads
+
+x-restart: &restart
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *restart
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qualityreads:latest
+    init: true                 # tini as PID 1: signal forwarding + zombie reaping
+    stop_grace_period: 30s     # let in-flight SSE streams close cleanly
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      TZ: ${TZ:-UTC}
+      NEXT_TELEMETRY_DISABLED: "1"
+
+      # The /${MONGO_DB} path segment is required: every call site uses
+      # client.db() with no argument, so the database name comes from the URI.
+      # authSource=admin because MONGO_INITDB_ROOT_USERNAME is created there.
+      # retryWrites=false because retryable writes need a replica set.
+      MONGODB_URI: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin&retryWrites=false"
+
+      # NOTE: a bare hostname, not a redis:// URL -- lib/redis.ts passes this
+      # straight through as ioredis's `host`.
+      REDIS_URI: "redis"
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
+      AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_URL: "${AUTH_URL}"
+      AUTH_TRUST_HOST: "true"
+      AUTH_GOOGLE_ID: "${AUTH_GOOGLE_ID}"
+      AUTH_GOOGLE_SECRET: "${AUTH_GOOGLE_SECRET}"
+    ports:
+      # Bound to loopback by default so only the host's reverse proxy can reach
+      # it. Set APP_BIND=0.0.0.0 in .env if your proxy runs elsewhere.
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    volumes:
+      - next_image_cache:/app/.next/cache
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks: [backend]
+
+  mongo:
+    <<: *restart
+    # Standalone, no replica set: nothing in this codebase uses transactions,
+    # sessions, change streams or Atlas-only aggregation stages.
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_USER}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+      MONGO_INITDB_DATABASE: "${MONGO_DB}"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+      # The `z` suffix relabels for SELinux (Fedora/RHEL hosts, and rootless
+      # podman). It is accepted and ignored where SELinux is not enforcing.
+      - ./docker/mongo-init:/docker-entrypoint-initdb.d:ro,z
+      - ./seed:/seed:ro,z
+    healthcheck:
+      # ping is allowed pre-auth, so no credentials are needed here.
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [backend]
+    # No published ports: the app reaches it by service name over the bridge.
+
+  redis:
+    <<: *restart
+    image: redis:7.4-alpine
+    command:
+      - redis-server
+      - --requirepass
+      - "${REDIS_PASSWORD}"
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - "everysec"
+      - --save
+      - "900 1"
+      - --save
+      - "300 10"
+      # Load-bearing: Redis holds durable data here (notifications and trending
+      # sorted sets), so an eviction policy would silently delete real records.
+      - --maxmemory-policy
+      - "noeviction"
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks: [backend]
+
+volumes:
+  mongo_data:
+  mongo_config:
+  redis_data:
+  next_image_cache:
+
+networks:
+  backend:
+    driver: bridge

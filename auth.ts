@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthConfig, } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
-import clientPromise from "@/lib/db"
+import { getMongoClient } from "@/lib/db"
 
 export const authOptions: NextAuthConfig = {
   providers: [
@@ -16,7 +16,7 @@ export const authOptions: NextAuthConfig = {
       console.log(`User signed in ${user.email}`)
     }
   },
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(() => getMongoClient()),
 };
 
 export const { signIn, signOut, auth, handlers } = NextAuth(authOptions);

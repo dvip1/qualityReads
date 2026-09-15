@@ -1,128 +1,87 @@
 "use client"
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import * as Ably from "ably";
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { toast } from "react-toastify";
 import { useSession } from 'next-auth/react';
+import { getNotificationCount } from '@/app/notification/service';
 
-interface AblyContextType {
+interface NotificationContextType {
     unreadCount: number;
     resetUnreadCount: () => void;
+    refreshUnreadCount: () => void;
 }
 
-const AblyContext = createContext<AblyContextType | undefined>(undefined);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-interface AblyProviderProps {
+interface NotificationProviderProps {
     children: React.ReactNode;
     userId: string;
     theme: string;
 }
 
-export function AblyProvider({ children, userId, theme }: AblyProviderProps) {
+export function NotificationProvider({ children, userId, theme }: NotificationProviderProps) {
     const [unreadCount, setUnreadCount] = useState(0);
-    const [ably, setAbly] = useState<Ably.Realtime | null>(null);
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
+
+    const refreshUnreadCount = useCallback(async () => {
+        if (!userId) return;
+        try {
+            const response = await getNotificationCount(userId);
+            setUnreadCount(Number(response?.data ?? 0));
+        } catch (error) {
+            console.error('Failed to refresh notification count:', error);
+        }
+    }, [userId]);
 
     useEffect(() => {
         if (!userId || !session) return;
 
-        const connectToAbly = async () => {
-            try {
-                const ablyInstance = new Ably.Realtime({ authUrl: `/api/Ably?userId=${userId}` });
-                await ablyInstance.connection.once('connected');
-                console.log('Ably connected');
+        // EventSource reconnects on its own (honouring the `retry:` hint the
+        // server sends), so there is no manual reconnect logic to maintain.
+        const source = new EventSource('/api/notifications/stream');
 
-                ablyInstance.connection.on('disconnected', () => {
-                    console.log('Ably connection disconnected');
-                    // Attempt to reconnect
-                    reconnectToAbly(ablyInstance);
-                });
+        source.addEventListener('ready', () => {
+            // Redis pub/sub is fire-and-forget, so anything published while this
+            // tab was disconnected never arrived. Resync on every (re)connect.
+            refreshUnreadCount();
+        });
 
-                ablyInstance.connection.on('closed', () => {
-                    console.log('Ably connection closed');
-                    // Attempt to reconnect
-                    reconnectToAbly(ablyInstance);
-                });
+        source.addEventListener('notification', () => {
+            setUnreadCount((previous) => previous + 1);
+            toast('🔔 You have a new notification!', {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: theme === 'dark' ? 'dark' : 'light',
+                toastId: `notification-${Date.now()}`,
+            });
+        });
 
-                setAbly(ablyInstance);
-            } catch (error) {
-                console.error('Error connecting to Ably:', error);
+        source.onerror = () => {
+            // Readable state only; the browser retries automatically.
+            if (source.readyState === EventSource.CLOSED) {
+                console.warn('[notifications] stream closed');
             }
         };
 
-        const reconnectToAbly = (ablyInstance: Ably.Realtime) => {
-            try {
-                ablyInstance.connection.connect();
-            } catch (error) {
-                console.error('Error reconnecting to Ably:', error);
-                // Implement fallback logic or notify the user
-            }
-        };
+        return () => source.close();
+    }, [userId, session, theme, refreshUnreadCount]);
 
-        connectToAbly();
-
-        return () => {
-            if (ably) {
-                ably.close();
-            }
-        };
-    }, [userId, session]);
-
-    useEffect(() => {
-        if (!ably) {
-            console.warn('Ably instance is not available, skipping channel setup');
-            return;
-        }
-
-        const channel = ably.channels.get(`notifications:${userId}`);
-        let activeToasts: React.ReactText[] = [];
-
-        const handleNotification = (message: any) => {
-            try {
-                setUnreadCount((prevCount) => prevCount + 1);
-                const toastId = toast(`🔔 You have a new notification!`, {
-                    position: 'top-right',
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: theme === 'dark' ? 'dark' : 'light',
-                    toastId: `notification-${new Date().getTime()}`,
-                });
-                activeToasts.push(toastId);
-            } catch (error) {
-                console.error('Error processing notification:', error);
-            }
-        };
-
-        channel.subscribe('new-notification', handleNotification);
-
-        return () => {
-            console.log('Unsubscribing from channel and dismissing toasts');
-            if (channel) {
-                channel.unsubscribe('new-notification', handleNotification);
-            }
-            if (activeToasts.length > 0) {
-                activeToasts.forEach((id) => toast.dismiss(id));
-            }
-        };
-    }, [ably, userId, theme]);
-
-    const resetUnreadCount = () => {
-        setUnreadCount(0);
-    };
+    const resetUnreadCount = () => setUnreadCount(0);
 
     return (
-        <AblyContext.Provider value={{ unreadCount, resetUnreadCount }}>
+        <NotificationContext.Provider value={{ unreadCount, resetUnreadCount, refreshUnreadCount }}>
             {children}
-        </AblyContext.Provider>
+        </NotificationContext.Provider>
     );
 }
-export function useAbly() {
-    const context = useContext(AblyContext);
+
+export function useNotifications() {
+    const context = useContext(NotificationContext);
     if (context === undefined) {
-        throw new Error('useAbly must be used within an AblyProvider');
+        throw new Error('useNotifications must be used within a NotificationProvider');
     }
     return context;
 }

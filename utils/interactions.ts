@@ -1,10 +1,10 @@
 "use server"
-import clientPromise from "@/lib/db";
+import { getMongoClient } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import fetchUserData from "./fetchUserData";
 import Trending from "@/lib/Trending";
 import { getRedisClient } from "@/lib/redis";
-import { PostNotificationData, PostNoificationAbly } from "@/app/notification/service";
+import { saveNotification, publishNotification } from "@/lib/notifications";
 
 export interface LikePostTypes {
     like: boolean
@@ -17,17 +17,21 @@ export interface DislikePostTypes {
 const LikePost = async (props: LikePostTypes) => {
     try {
         if (!props.postId) return null;
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
         const Postcollection = db.collection('posts');
-        const redisClient = await getRedisClient();
+        const redisClient = getRedisClient();
         const TrendingObject = new Trending(redisClient);
         await updateTrendingScore(TrendingObject, props);
         const user = await getUserById(Postcollection, props.postId.toString());
-        const userId = user ? user.user_id.toString() : null;
+        const ownerId = user?.user_id ? user.user_id.toString() : null;
+        if (!ownerId) {
+            console.warn(`Post ${props.postId} has no owner; skipping like`);
+            return null;
+        }
         const userData = await fetchUserData();
-        await sendNotification(userId.toString(), props.postId.toString(), userData._id);
-        const updateOperation = await getUpdateOperation(Postcollection, props, userData._id, userId);
+        await sendNotification(ownerId, props.postId.toString(), userData._id);
+        const updateOperation = await getUpdateOperation(Postcollection, props, userData._id, ownerId);
         const updatedPost = await updatePost(Postcollection, props.postId.toString(), updateOperation);
 
         return formatResponse(updatedPost);
@@ -60,18 +64,19 @@ const sendNotification = async (userId: string, postId: string, metaId: ObjectId
         metaId: metaId.toString(),
         type: "liked"
     };
-    await PostNotificationData(NotificationData)
+    await saveNotification(NotificationData);
 };
 
-const getUpdateOperation = async (Postcollection: any, props: LikePostTypes, userId: ObjectId, metaId: string) => {
+const getUpdateOperation = async (Postcollection: any, props: LikePostTypes, likerId: ObjectId, ownerId: string) => {
     const post = await Postcollection.findOne({ _id: new ObjectId(props.postId) });
-    const isLiked = post?.liked_by?.includes(userId);
+    const isLiked = post?.liked_by?.includes(likerId);
 
     if (isLiked) {
-        return { $inc: { likes: -1 }, $pull: { liked_by: userId } };
+        return { $inc: { likes: -1 }, $pull: { liked_by: likerId } };
     } else {
-        PostNoificationAbly(metaId);
-        return { $inc: { likes: 1 }, $push: { liked_by: userId } };
+        // Nudge the post owner's open tabs. Fire-and-forget by design.
+        void publishNotification(ownerId, { type: "liked", postId: props.postId.toString() });
+        return { $inc: { likes: 1 }, $push: { liked_by: likerId } };
     }
 };
 
@@ -106,7 +111,7 @@ const DislikePost = async (props: DislikePostTypes) => {
     try {
         if (!props.postId) return null;
 
-        const client = await clientPromise;
+        const client = await getMongoClient();
         const db = client.db();
         const Postcollection = db.collection('posts');
         const userData = await fetchUserData();

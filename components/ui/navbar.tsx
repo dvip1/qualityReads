@@ -11,8 +11,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { FaBook } from "react-icons/fa";
 import { Badge } from "@nextui-org/badge";
-import fetchUserData from "@/utils/fetchUserData";
-import { getNotificationCount } from "@/app/notification/service";
+import { useNotifications } from "@/components/context/NotificationContext";
 import { IoNotifications } from "react-icons/io5";
 
 export default function NavBar() {
@@ -22,7 +21,9 @@ export default function NavBar() {
     const { data: session, status } = useSession();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isActive, setIsActive] = useState(0);
-    const [count, setCount] = useState(0);
+    // Live count: seeded when the notification stream connects and incremented
+    // on each event, so the badge no longer goes stale after mount.
+    const { unreadCount } = useNotifications();
     const handleSignOut = async () => {
         await signOut();
         console.log('Sign out');
@@ -47,14 +48,6 @@ export default function NavBar() {
         }
         setIsActive(temp());
     }, [pathname]);
-    useEffect(() => {
-        const handleData = async () => {
-            const userData = await fetchUserData();
-            const req = await getNotificationCount(userData._id.toString());
-            setCount(req.data || 0);
-        };
-        handleData();
-    }, []);
 
     return (
         <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -88,7 +81,7 @@ export default function NavBar() {
                 <Dropdown placement="bottom-end">
                     <DropdownTrigger>
                         <div>
-                            <Badge content={count} color="secondary" className="transition-transform">
+                            <Badge content={unreadCount} color="secondary" className="transition-transform">
                                 <Avatar
                                     isBordered
                                     as="button"

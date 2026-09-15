@@ -1,6 +1,5 @@
 import RedisNotificationService from "./redisService";
 import { getRedisClient } from "@/lib/redis";
-import { Server } from 'socket.io';
 async function handleCountQuery(service: RedisNotificationService, userId: string) {
     const count = await service.getNotificationCount(userId);
     return Response.json({ data: count }, { status: 200 });
